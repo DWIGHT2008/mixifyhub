@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Dashboard Style</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f9f9f9; }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar .logo { font-weight: bold; font-size: 1.5em; color: #FF0000; }
+    .navbar .search { position: relative; }
+    .navbar .search input {
+      padding: 8px;
+      width: 300px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .search-results {
+      display: none;
+      position: absolute;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .search-results div {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .search-results div:hover {
+      background-color: #f0f0f0;
+    }
+    .navbar .icons {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      position: relative;
+    }
+    .dropdown, .notifications {
+      display: none;
+      position: absolute;
+      top: 35px;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 200px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+    .dropdown div, .notifications div {
+      padding: 10px;
+      cursor: pointer;
+    }
+    .dropdown div:hover, .notifications div:hover {
+      background-color: #f0f0f0;
+    }
+    .top-tabs {
+      display: flex;
+      overflow-x: auto;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+      position: sticky;
+      top: 60px;
+      z-index: 99;
+    }
+    .top-tabs a {
+      padding: 10px 15px;
+      color: #333;
+      text-decoration: none;
+      font-size: 0.95em;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .top-tabs a:hover {
+      background-color: #f1f1f1;
+    }
+    .content {
+      padding: 20px;
+    }
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .video-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .video-card img {
+      width: 100%;
+      height: auto;
+    }
+    .video-info {
+      padding: 10px;
+    }
+    .video-info h4 {
+      font-size: 1em;
+      margin-bottom: 5px;
+    }
+    .video-info p {
+      font-size: 0.85em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">MyTube</div>
+    <div class="search">
+      <input type="text" id="searchInput" placeholder="Search...">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div class="icons">
+      <span onclick="toggleNotifications()">🔔</span>
+      <div class="notifications" id="notifPanel">
+        <div>No new notifications</div>
+        <div>Reminder: Upload scheduled</div>
+      </div>
+      <span onclick="toggleProfileMenu()">👤</span>
+      <div class="dropdown" id="profileMenu">
+        <div>My Channel</div>
+        <div>Settings</div>
+        <div>Logout</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-tabs">
+    <a onclick="showTab('tab1')">Videos</a>
+    <a href="home.html">Live Fetch videos</a>
+    <a href="youtube.html">   Youtube videos</a>
+    <a href="facebook.html"    >Facebook feeds</a>
+    <a href="ointerest.html"    >Pinterest Videos</a>
+    <a href="tito.html"         >Tik-tok videos</a>
+    <a href="instagram.html"    >Instagram videos</a>
+    <a  href="reel.html"                        >Reels</a>
+    <a  href="images.html"      >Images</a>
+    <a onclick="showTab('tab10')"> Library  </a>
+    <a href="news.html"         > News  </a>
+    <a href="inbox.html"       >   Update </a>
+  </div>
+
+ 
+  <script>
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-section');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function toggleNotifications() {
+      document.getElementById('notifPanel').classList.toggle('show');
+      document.getElementById('profileMenu').style.display = 'none';
+    }
+
+    function toggleProfileMenu() {
+      document.getElementById('profileMenu').classList.toggle('show');
+      document.getElementById('notifPanel').style.display = 'none';
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.icons')) {
+        document.getElementById('profileMenu').style.display = 'none';
+        document.getElementById('notifPanel').style.display = 'none';
+      }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const val = e.target.value.toLowerCase();
+      const resultsBox = document.getElementById('searchResults');
+      resultsBox.innerHTML = '';
+      if (val.length > 0) {
+        resultsBox.style.display = 'block';
+        resultsBox.innerHTML = `<div>Result for "${val}"</div><div>Channel: ${val}Tube</div>`;
+      } else {
+        resultsBox.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

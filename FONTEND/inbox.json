@@ -1,0 +1,43 @@
+{
+    "updates": [
+      {
+        "id": 1,
+        "title": "Platform Update",
+        "content": "We've added dark mode support!",
+        "timestamp": "2025-06-01",
+        "read": false
+      },
+      {
+        "id": 2,
+        "title": "Bug Fixes",
+        "content": "Chat bug resolved.",
+        "timestamp": "2025-05-28",
+        "read": false
+      }
+    ],
+    "announcements": [
+      {
+        "id": 3,
+        "title": "Welcome!",
+        "content": "Thanks for joining MixifyHub!",
+        "timestamp": "2025-05-15",
+        "read": true
+      }
+    ],
+    "help": [
+      {
+        "id": 4,
+        "title": "How to connect accounts?",
+        "content": "Go to Settings > Accounts.",
+        "timestamp": "2025-05-20",
+        "read": false
+      },
+      {
+        "id": 5,
+        "title": "Need help?",
+        "content": "Contact support@mixifyhub.com",
+        "timestamp": "2025-06-25",
+        "read": true
+      }
+    ]
+  }

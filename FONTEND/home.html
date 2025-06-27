@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YouTube Videos</title>
+  <link rel="stylesheet" href="test.css" />
+</head>
+<body>
+  
+  <header>
+    <div class="logo">
+      <span class="back-button" onclick="history.back()">↩️</span> </p>
+      YouTube
+    </div>
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Search videos..." />
+      <button id="search-btn" onclick="searchVideos()">Search</button>
+      <span id="loading-indicator" style="display:none; margin-left:8px;">Loading...</span>
+    </div>
+    <div class="icons">
+      <div class="bell" onclick="toggleNotifications()">
+        🔔
+        <div class="badge" id="badge">3</div>
+        <div class="notifications" id="notifications">
+          <p>New video from Tech Channel</p>
+          <p>Live now: News Stream</p>
+          <p>New updates <a href="inbox.html"><strong>check inbox</strong></a></p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <button onclick="localStorage.removeItem('lastSearchResults'); location.reload();">
+    Clear Videos
+  </button>
+
+  <main>
+    <div id="video-container">
+      <div id="fetched-section" class="video-section"></div>
+      <h2 class="section-label">📺 Recommended Videos</h2>
+      <div id="dummy-section" class="video-section"></div>
+    </div>
+  </main>
+
+  <div class="modal" id="videoModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">✖</span>
+      <video id="introPlayer" class="video-frame" style="display:none;" autoplay></video>
+      <iframe id="youtubeFrame" class="video-frame" src="..." style="display:none;"></iframe>
+      <h3 id="modalTitle"></h3>
+      <p id="modalChannel"></p>
+    </div>
+  </div>
+
+  <script>
+    const dummyVideos = [
+      {
+        id: { videoId: 'dQw4w9WgXcQ' },
+        snippet: {
+          title: 'Rick Astley - Never Gonna Give You Up',
+          thumbnails: { medium: { url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg' } },
+          channelTitle: '80s Classics'
+        }
+      },
+      {
+        id: { videoId: '3JZ_D3ELwOQ' },
+        snippet: {
+          title: 'Epic Space Music',
+          thumbnails: { medium: { url: 'https://img.youtube.com/vi/3JZ_D3ELwOQ/mqdefault.jpg' } },
+          channelTitle: 'Epic Sounds'
+        }
+      },
+      {
+        id: { videoId: 'Ks-_Mh1QhMc' },
+        snippet: {
+          title: 'Inspirational Speech - Never Give Up',
+          thumbnails: { medium: { url: 'https://img.youtube.com/vi/Ks-_Mh1QhMc/mqdefault.jpg' } },
+          channelTitle: 'Motivation Central'
+        }
+      },
+      {
+        id: { videoId: 'L_jWHffIx5E' },
+        snippet: {
+          title: 'Beastie Boys - Sabotage',
+          thumbnails: { medium: { url: 'https://img.youtube.com/vi/L_jWHffIx5E/mqdefault.jpg' } },
+          channelTitle: '90s Music Vibes'
+        }
+      },
+      {
+        id: { videoId: 'e-ORhEE9VVg' },
+        snippet: {
+          title: 'Taylor Swift - Blank Space',
+          thumbnails: { medium: { url: 'https://img.youtube.com/vi/e-ORhEE9VVg/mqdefault.jpg' } },
+          channelTitle: 'TaylorSwiftVEVO'
+        }
+      },
+      {
+        id: { videoId: 'J---aiyznGQ' },
+        snippet: {
+          title: 'Charlie bit my finger - again!',
+          thumbnails: { medium: { url: 'https://img.youtube.com/vi/J---aiyznGQ/mqdefault.jpg' } },
+          channelTitle: 'Viral Classics'
+        }
+      },
+      {
+        id: { videoId: '60ItHLz5WEA' },
+        snippet: {
+          title: 'Alan Walker - Faded',
+          thumbnails: { medium: { url: 'https://img.youtube.com/vi/60ItHLz5WEA/mqdefault.jpg' } },
+          channelTitle: 'Alan Walker'
+        }
+      }
+    ];
+
+    // Elements
+    const searchInput = document.getElementById('search');
+    const fetchedSection = document.getElementById('fetched-section');
+    const dummySection = document.getElementById('dummy-section');
+    const cacheIndicator = document.getElementById('cache-indicator');
+    const searchBtn = document.getElementById('search-btn');
+    const loadingIndicator = document.getElementById('loading-indicator');
+
+    function trackSearch(query) {
+      fetch('http://localhost:5000/api/analytics/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, timestamp: Date.now() }),
+      }).catch(err => console.warn('Analytics error:', err));
+    }
+
+    function showCacheIndicator(fromCache) {
+      if (!cacheIndicator) return;
+      cacheIndicator.textContent = fromCache ? 'Showing cached results' : '';
+    }
+
+    function setLoading(isLoading) {
+      if (!loadingIndicator || !searchBtn) return;
+      loadingIndicator.style.display = isLoading ? 'inline-block' : 'none';
+      searchBtn.disabled = isLoading;
+      searchInput.disabled = isLoading;
+    }
+
+    function searchVideos() {
+      const query = searchInput.value.trim();
+      if (!query) return;
+
+      setLoading(true);
+      trackSearch(query);
+
+      fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          localStorage.setItem('lastSearchResults', JSON.stringify({ items: data, fetchedAt: Date.now() }));
+          renderVideos(data);
+          showCacheIndicator(false);
+        })
+        .catch(err => {
+          console.error('Search error:', err);
+          const cached = localStorage.getItem('lastSearchResults');
+          if (cached) {
+            const cachedData = JSON.parse(cached);
+            renderVideos(cachedData.items);
+            showCacheIndicator(true);
+          } else {
+            fetchedSection.innerHTML = '<p>No results found and no cache available.</p>';
+            dummySection.innerHTML = '';
+            showCacheIndicator(false);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+
+    function renderVideos(fetchedItems = []) {
+      fetchedSection.innerHTML = '';
+      dummySection.innerHTML = '';
+
+      const seenVideoIds = new Set();
+
+      if (fetchedItems.length > 0) {
+        fetchedItems.forEach(item => {
+          const videoId = item.id.videoId;
+          if (!seenVideoIds.has(videoId)) {
+            seenVideoIds.add(videoId);
+            const card = createCard(item);
+            fetchedSection.appendChild(card);
+          }
+        });
+      }
+
+      dummyVideos.forEach(dummy => {
+        const videoId = dummy.id.videoId;
+        if (!seenVideoIds.has(videoId)) {
+          seenVideoIds.add(videoId);
+          const card = createCard(dummy);
+          dummySection.appendChild(card);
+        }
+      });
+    }
+
+    function createCard(item) {
+      const videoId = item.id.videoId;
+      const { title, thumbnails, channelTitle } = item.snippet;
+    
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <div class="video-wrapper" data-video-id="${videoId}">
+          <img class="thumbnail" src="${thumbnails.medium.url}" alt="${title}" />
+          <iframe class="hover-preview" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+        <h4>${title}</h4>
+        <p>${channelTitle}</p>
+      `;
+    
+      card.onclick = () => openModal(videoId, title, channelTitle);
+    
+      const wrapper = card.querySelector('.video-wrapper');
+      const iframe = wrapper.querySelector('.hover-preview');
+      const img = wrapper.querySelector('.thumbnail');
+    
+      wrapper.addEventListener('mouseenter', () => {
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0`;
+        iframe.style.display = 'block';
+        img.style.display = 'none';
+      });
+    
+      wrapper.addEventListener('mouseleave', () => {
+        iframe.src = '';
+        iframe.style.display = 'none';
+        img.style.display = 'block';
+      });
+    
+      return card;
+    }
+
+    function openModal(videoId, title, channel) {
+      const modal = document.getElementById('videoModal');
+      const introPlayer = document.getElementById('introPlayer');
+      const youtubeFrame = document.getElementById('youtubeFrame');
+
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalChannel').textContent = `Channel: ${channel}`;
+
+      youtubeFrame.style.display = 'none';
+      youtubeFrame.src = '';
+      introPlayer.style.display = 'block';
+      introPlayer.src = './social plateforms/intro.mp4';
+
+      modal.classList.add('active');
+      introPlayer.play();
+
+      introPlayer.onended = () => {
+        introPlayer.style.display = 'none';
+        introPlayer.src = '';
+        youtubeFrame.style.display = 'block';
+        youtubeFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      };
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('videoModal');
+      modal.classList.remove('active');
+      document.getElementById('introPlayer').src = '';
+      document.getElementById('youtubeFrame').src = '';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('lastSearchResults');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        renderVideos(parsed.items);
+        showCacheIndicator(true);
+      } else {
+        renderVideos(); // show just dummy videos
+      }
+    });
+
+    // Stub for toggleNotifications (implement if needed)
+    function toggleNotifications() {
+      const notifications = document.getElementById('notifications');
+      notifications.style.display = (notifications.style.display === 'block') ? 'none' : 'block';
+    }
+  </script>
+
+</body>
+</html>

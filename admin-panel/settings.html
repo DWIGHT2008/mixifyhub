@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Site Settings</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <h1>Site Configuration Settings</h1>
+  <form id="settingsForm">
+    <label>App Name:
+      <input type="text" id="appName" required />
+    </label><br/>
+
+    <label>Admin Email:
+      <input type="email" id="adminEmail" required />
+    </label><br/>
+
+    <label>Theme:
+      <select id="theme">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label><br/>
+
+    <label>
+      <input type="checkbox" id="maintenance" />
+      Maintenance Mode
+    </label><br/>
+
+    <label>Footer Message:
+      <input type="text" id="footerText" />
+    </label><br/>
+
+    <button type="submit">Save Settings</button>
+  </form>
+
+  <p id="status"></p>
+  <script src="js/settings.js"></script>
+</body>
+</html>

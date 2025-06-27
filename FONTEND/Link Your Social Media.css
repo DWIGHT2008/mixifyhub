@@ -1,0 +1,90 @@
+/* Link Your Social Media.css */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #141e30, #243b55);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .social-section {
+    background-color: #1f2937;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .social-section h3 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: #00bcd4;
+  }
+  
+  #socialForm input[type="url"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 6px;
+    background-color: #374151;
+    color: #f9fafb;
+    font-size: 0.95rem;
+    outline: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  #socialForm input[type="url"]:focus {
+    background-color: #4b5563;
+  }
+  
+  #socialForm button {
+    width: 100%;
+    padding: 12px;
+    background-color: #00bcd4;
+    color: #ffffff;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background-color 0.3s ease;
+  }
+  
+  #socialForm button:hover {
+    background-color: #0097a7;
+  }
+  
+  .social-icons {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  /* Optional styling for icons if added via JS */
+  .social-icons a {
+    text-decoration: none;
+    color: white;
+    background-color: #00bcd4;
+    padding: 10px;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .social-icons a:hover {
+    background-color: #0097a7;
+  }

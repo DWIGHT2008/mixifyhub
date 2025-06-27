@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mixifyhub/Inbox</title>
+  <link rel="stylesheet" href="inbox.css" />
+</head>
+<body>
+  <div class="inbox-container">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('updates')">Updates</div>
+      <div class="tab" onclick="switchTab('announcements')">Announcements</div>
+      <div class="tab" onclick="switchTab('viewupdates')">View Updates</div>
+      <div class="tab"><a href="help.html">Help</a></div>
+    </div>
+   
+    <div class="messages" id="messageContainer"></div>
+  </div>
+
+<!-- View Updates Section -->
+<div id="viewUpdatesSection" class="hidden">
+  <div class="search-bar">
+    <input type="text" id="updateSearchInput" placeholder="Search updates..." oninput="renderUpdates()" />
+  </div>
+  <div class="update-cards" id="updateCardsContainer"></div>
+</div>
+
+
+
+  <!-- Modal -->
+  <div class="modal" id="previewModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle"></h3>
+      <p id="modalContent"></p>
+      <time id="modalTime"></time>
+    </div>
+  </div>
+
+  <script src="inbox.js"></script>
+</body>
+</html>

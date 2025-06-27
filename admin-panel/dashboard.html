@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+    .metrics { display: flex; flex-wrap: wrap; gap: 20px; }
+    .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; min-width: 200px; text-align: center; }
+    h1 { margin-bottom: 20px; }
+    canvas { background: white; border-radius: 10px; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>📊 Admin Analytics Dashboard</h1>
+  <div class="metrics">
+    <div class="card" id="totalUsers">👥 Total Users: </div>
+    <div class="card" id="bannedUsers">🚫 Banned Users: </div>
+    <div class="card" id="totalPosts">📝 Total Posts: </div>
+    <div class="card" id="totalComments">💬 Total Comments: </div>
+    <div class="card" id="reportedItems">⚠️ Reported Items: </div>
+  </div>
+  <br />
+  <canvas id="dailyUsersChart" height="100"></canvas>
+
+  <script>
+    async function fetchAnalytics() {
+      const token = localStorage.getItem("token"); // or sessionStorage
+  
+      const res = await fetch('/admin/analytics', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      if (!res.ok) {
+        document.body.innerHTML = `<h2 style="color:red;">Access Denied or Failed to Load Analytics</h2>`;
+        return;
+      }
+  
+      const data = await res.json();
+  
+      document.getElementById('totalUsers').textContent += data.totalUsers;
+      document.getElementById('bannedUsers').textContent += data.bannedUsers;
+      document.getElementById('totalPosts').textContent += data.totalPosts;
+      document.getElementById('totalComments').textContent += data.totalComments;
+      document.getElementById('reportedItems').textContent += data.reportedItems;
+  
+      const ctx = document.getElementById('dailyUsersChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.dailyUsers.map(d => d.date),
+          datasets: [{
+            label: 'New Users Per Day',
+            data: data.dailyUsers.map(d => d.count),
+            fill: true,
+            borderColor: '#4e73df',
+            backgroundColor: 'rgba(78, 115, 223, 0.2)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+  
+    fetchAnalytics();
+  </script>
+</body>
+</html>

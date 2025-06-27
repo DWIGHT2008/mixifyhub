@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MIXIFYHUB IMAGE TOOL</title>
+  <link rel="stylesheet" href="image.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ 
+</head>
+<body>
+  <h1>MIXIFYHUB IMAGE TOOL</h1>
+
+  <!-- Tab Buttons -->
+  
+  <!-- SEARCH SECTION -->
+  <section id="search-tab">
+    <input type="text" id="query" placeholder="Search for images..." />
+    <button class="search-tab" onclick="switchTab('generate')">🎨 Generate</button>
+    <button class="search-tab" onclick="searchImages()">Search</button>
+  </section>
+
+  <!-- GENERATE SECTION -->
+  <section id="generate-tab" style="display:none;">
+    <input type="text" id="generatePrompt" placeholder="Enter prompt to generate image..." />
+    <button onclick="startVoice()">🎙️</button>
+    <button onclick="generateImage()">Generate Image</button>
+    <button onclick="switchTab('search')">🔍 Search</button>
+  </section>
+  
+  <!-- Sidebar Button & Menu -->
+  <button id="toggle-sidebar">⚙️ Quick Menu</button>
+  <aside id="settings-sidebar">
+    <h2>Quick Menu</h2>
+    <div class="sidebar-section">
+      <div class="theme-toggle">
+        <label class="switch">
+          <input type="checkbox" id="themeSwitch">
+          <span class="slider round"></span>
+        </label>
+        <span id="themeLabel">🌙 Dark Mode</span>
+      </div>
+      <h4>Layout</h4>
+      <label><input type="radio" name="layout" value="grid" checked /> Grid View</label><br />
+      <label><input type="radio" name="layout" value="list" /> List View</label>
+    </div>
+    <ul>
+      <li><a href="dashboard.html">🏠 Dashboard</a></li>
+      <li><a href="MixifyHub AI.html"> MivifyHub Ai Assistant</a></li>
+      <li><a href="connectedaccounts.html">🌐 Connected Accounts</a></li>
+      <li><a href="leaderboard.html">🏆 Leaderboard</a></li>
+      <li><a href="information.html">📩 Updates</a></li>
+      <li><a href="news.html">📰 News</a></li>
+      <li><a href="profile.html">⚙️ Settings</a></li>
+      <li><a href="register.html">🚪 Logout</a></li>
+    </ul>
+    <button id="close-sidebar">Close</button>
+  </aside>
+  <!-- Image Results -->
+  <div id="imagesContainer" class="image-results"></div>
+  <script>
+
+    const themeSwitch = document.getElementById("themeSwitch");
+    const themeLabel = document.getElementById("themeLabel");
+  
+    // Load saved theme
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "light") {
+        document.body.classList.add("light");
+        themeSwitch.checked = true;
+        themeLabel.textContent = "☀️ Light Mode";
+      }
+    });
+  
+    themeSwitch.addEventListener("change", () => {
+      if (themeSwitch.checked) {
+        document.body.classList.add("light");
+        localStorage.setItem("theme", "light");
+        themeLabel.textContent = "☀️ Light Mode";
+      } else {
+        document.body.classList.remove("light");
+        localStorage.setItem("theme", "dark");
+        themeLabel.textContent = "🌙 Dark Mode";
+      }
+    });
+
+
+    // Tab switching
+    function switchTab(tab) {
+      document.getElementById("search-tab").style.display = tab === "search" ? "block" : "none";
+      document.getElementById("generate-tab").style.display = tab === "generate" ? "block" : "none";
+      document.getElementById("imagesContainer").innerHTML = "";
+    }
+  
+    // Voice input
+    function startVoice() {
+      const promptInput = document.getElementById("generatePrompt");
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return alert("Voice input not supported in this browser.");
+  
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+  
+      recognition.onresult = event => {
+        promptInput.value = event.results[0][0].transcript;
+      };
+  
+      recognition.onerror = event => {
+        alert("Voice error: " + event.error);
+      };
+  
+      recognition.start();
+    }
+  
+    // Sidebar toggle and layout switching
+    document.addEventListener("DOMContentLoaded", () => {
+      const sidebar = document.getElementById("settings-sidebar");
+      document.getElementById("toggle-sidebar").onclick = () => sidebar.classList.toggle("open");
+      document.getElementById("close-sidebar").onclick = () => sidebar.classList.remove("open");
+  
+      const layoutRadios = document.querySelectorAll('input[name="layout"]');
+      const container = document.getElementById("imagesContainer");
+  
+      layoutRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+          if (radio.value === "list") {
+            container.style.display = "block";
+            document.querySelectorAll(".image-card").forEach(card => {
+              card.style.width = "100%";
+              card.style.marginBottom = "1rem";
+            });
+          } else {
+            container.style.display = "grid";
+            container.style.gridTemplateColumns = "repeat(auto-fit, minmax(250px, 1fr))";
+          }
+        });
+      });
+  
+      // Restore last search (optional)
+      const lastQuery = localStorage.getItem("lastQuery");
+        const lastSearchResults = localStorage.getItem("lastSearchResults");
+
+        if (lastQuery) document.getElementById("query").value = lastQuery;
+        if (lastSearchResults) renderImages(JSON.parse(lastSearchResults));
+
+        // Also load saved/generated images
+        const saved = JSON.parse(localStorage.getItem("savedImages") || "[]");
+        if (saved.length > 0) renderImages(saved);
+
+    });
+
+    
+    async function searchImages() {
+      const query = document.getElementById("query").value.trim();
+      if (!query) return;
+    
+      const container = document.getElementById("imagesContainer");
+      container.innerHTML = '<div class="spinner"></div>';
+    
+      try {
+        const res = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("Bad response");
+    
+        // Store last query and results
+        localStorage.setItem("lastQuery", query);
+        localStorage.setItem("lastSearchResults", JSON.stringify(data));
+    
+        renderImages(data);
+      } catch (err) {
+        alert("Search failed.");
+        container.innerHTML = "";
+        console.error(err);
+      }
+    }
+    
+  
+    // Generate AI Image
+    async function generateImage() {
+      const prompt = document.getElementById("generatePrompt").value.trim();
+      if (!prompt) return alert("Please enter a prompt.");
+      const container = document.getElementById("imagesContainer");
+      container.innerHTML = '<div class="spinner"></div>';
+      try {
+        const res = await fetch("http://localhost:5000/image/replicate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await res.json();
+        if (!data.output) throw new Error("Invalid image output");
+  
+        const imageObj = {
+          id: "ai-" + Date.now(),
+          src: data.output,
+          full: data.output,
+          alt: prompt,
+        };
+  
+        // Save to localStorage
+        const saved = JSON.parse(localStorage.getItem("savedImages") || "[]");
+        saved.push(imageObj);
+        localStorage.setItem("savedImages", JSON.stringify(saved));
+  
+        renderImages([imageObj]);
+      } catch (err) {
+        alert("Image generation failed.");
+        container.innerHTML = "";
+        console.error(err);
+      }
+    }
+  
+    // Render image cards
+    function renderImages(images) {
+      const container = document.getElementById("imagesContainer");
+      container.innerHTML = "";
+      images.forEach(photo => {
+        const card = document.createElement("div");
+        card.className = "image-card";
+        const img = document.createElement("img");
+        img.src = photo.src || photo;
+        img.alt = photo.alt || "Image";
+  
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "btn-group";
+  
+        const saveBtn = document.createElement("div");
+        saveBtn.className = "btn";
+        saveBtn.textContent = "💾 Save";
+        saveBtn.onclick = () => saveImage(photo);
+  
+        const downloadBtn = document.createElement("div");
+        downloadBtn.className = "btn";
+        downloadBtn.textContent = "⬇ Download";
+        downloadBtn.onclick = () => downloadImage(photo);
+  
+        btnGroup.append(saveBtn, downloadBtn);
+        card.append(img, btnGroup);
+        container.appendChild(card);
+      });
+    }
+  
+    // Save image manually (avoid duplicates)
+    function saveImage(photo) {
+      const saved = JSON.parse(localStorage.getItem("savedImages") || "[]");
+      const id = photo.id || photo;
+      if (!saved.some(img => (img.id || img) === id)) {
+        saved.push(photo);
+        localStorage.setItem("savedImages", JSON.stringify(saved));
+        alert("Image saved!");
+      } else {
+        alert("Image already saved.");
+      }
+    }
+  
+    // Download image
+    async function downloadImage(photo) {
+      try {
+        const url = photo.full || photo.src || photo;
+        const blob = await fetch(url).then(r => r.blob());
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${photo.id || "image"}.jpg`;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (err) {
+        alert("Download failed.");
+        console.error(err);
+      }
+    }
+  
+    // Clear all saved images (optional function)
+    function clearSavedImages() {
+      if (confirm("Clear all saved images?")) {
+        localStorage.removeItem("savedImages");
+        document.getElementById("imagesContainer").innerHTML = "";
+      }
+    }
+  </script>
+</body>
+</html>

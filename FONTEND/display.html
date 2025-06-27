@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Fusion App</title>
+  <link rel="stylesheet" href="test.css"> <!-- your CSS -->
+  <style>
+    /* inline styles from second code */
+    :root { font-family: sans-serif; }
+    iframe { width:100%; aspect-ratio:16/9; border:none; }
+    .videos-grid, #channel-videos { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:10px; }
+    .video-wrapper, .reel-item { background:#111; border-radius:12px; overflow:hidden; padding:10px; box-shadow:0 2px 10px rgba(0,0,0,0.4); display:flex; flex-direction:column; align-items:center; }
+    .fullscreen-btn { margin-top:8px; padding:8px 16px; font-size:15px; border:none; border-radius:6px; background:#f00; color:#fff; cursor:pointer; width:90%; max-width:300px; }
+    .fullscreen-btn:hover { background:#c00; }
+    .reel-wrapper { height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; }
+    .reel-item { height:100vh; scroll-snap-align:start; justify-content:center; }
+    body { background:#000; color:#fff; margin:0; padding:20px; }
+  </style>
+</head>
+<body>
+  <label for="theme-selector">Theme:</label>
+  <select id="theme-selector">
+    <option value="dark">🌑 Dark</option>
+    <option value="light">☀️ Light</option>
+    <option value="ocean">🌊 Ocean</option>
+    <option value="forest">🌲 Forest</option>
+    <option value="sunset">🌇 Sunset</option>
+  </select>
+
+  <header>
+    <div class="logo">YouTube</div>
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Search videos…" />
+      <button onclick="searchVideos()">Search</button>
+    </div>
+    <div class="icons">
+      <div class="bell" onclick="toggleNotifications()">🔔
+        <div class="badge" id="badge">3</div>
+        <div class="notifications" id="notifications">
+          <p>New video from Tech Channel</p>
+          <p>Live now: News Stream</p>
+          <p>New updates <a href="inbox.html"><strong>check inbox</strong></a></p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <button onclick="localStorage.removeItem('lastSearchResults'); location.reload();">Clear Videos</button>
+
+  <nav class="tabs">
+    <button class="tab-button active" onclick="showTab('all')">All</button>
+    <button class="tab-button" onclick="showTab('reels')">Reels</button>
+    <button class="tab-button" onclick="showTab('videos')">Videos</button>
+    <button class="tab-button" onclick="showTab('shorts')">Shorts</button>
+    <button class="tab-button" onclick="showTab('livestreams')">Live</button>
+  </nav>
+
+  
+ 
+
+
+  <div id="video-container">
+    <h2>📺 Search Results</h2>
+    <div id="fetched-section" class="video-section"></div>
+    
+  </div>
+
+    <main>
+
+      
+
+      <div id="video-container">
+        <div id="tab-all" class="tab-content active">
+          <h2 class="section-label">All Videos</h2>
+          <div id="all-section" class="video-section"></div>
+          <div id="video-list" class="videos-grid"></div>
+        </div>
+    
+        <div id="tab-reels" class="tab-content">
+          <h2 class="section-label">📱 Reels</h2>
+          <div id="reels-section" class="video-section"></div>
+        </div>
+    
+        <div id="tab-videos" class="tab-content">
+          <h2 class="section-label">📺 Full Videos</h2>
+          <div id="videos-section" class="video-section"></div>
+        </div>
+
+        <div id="tab-livestreams" class="tab-content">
+          <h2>🔴 Live Streams</h2>
+          <div id="video-list" class="videos-grid"></div>
+        </div>
+        
+        <div id="tab-shorts" class="tab-content">
+          <h2>📱 Shorts</h2>
+          
+           <div id="shorts-list" class="reel-wrapper"></div>
+        </div>
+      </div>
+    
+    
+    <div class="category">
+      <h2>🔎 Load by Channel ID</h2>
+      <input type="text" id="channelId" placeholder="Channel ID…" />
+      <button onclick="fetchChannelVideos()">Load Videos</button>
+      <div id="channel-videos"></div>
+    </div>
+  </main>
+
+  <!-- search modal -->
+  <div class="modal" id="videoModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">✖</span>
+      <video id="introPlayer" class="video-frame" style="display:none;" autoplay></video>
+      <iframe id="youtubeFrame" class="video-frame" style="display:none;"></iframe>
+      <h3 id="modalTitle"></h3>
+      <p id="modalChannel"></p>
+    </div>
+  </div>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    
+   // === THEME SWITCHER ===
+function changeTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+}
+const st = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', st);
+document.getElementById('theme-selector').value = st;
+document.getElementById('theme-selector').onchange = e => changeTheme(e.target.value);
+
+// === YOUTUBE SEARCH ===
+const API_KEY = 'AIzaSyAgT6qxqVWeyiEAmshDt-wzYO75rbgqH8g'; // Replace with your actual key
+const dummyVideos = []; // ← Your dummy data goes here
+
+function searchVideos() {
+  const q = document.getElementById('search').value.trim();
+  if (!q) return;
+  fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&key=${API_KEY}&maxResults=10&type=video`)
+    .then(r => r.json())
+    .then(d => {
+      localStorage.setItem('lastSearchResults', JSON.stringify(d.items));
+      renderVideos(d.items);
+    }).catch(console.error);
+}
+
+function renderVideos(fetchedItems = []) {
+  document.getElementById('all-section').innerHTML = '';
+  document.getElementById('videos-section').innerHTML = '';
+  document.getElementById('reels-section').innerHTML = '';
+
+  const seen = new Set();
+  const allVideos = [...fetchedItems, ...dummyVideos];
+
+  allVideos.forEach(item => {
+    const videoId = item.id.videoId;
+    if (seen.has(videoId)) return;
+    seen.add(videoId);
+
+    const card = createCard(item);
+
+    document.getElementById('all-section').appendChild(card.cloneNode(true));
+    const isReel = item.snippet.title.toLowerCase().includes('short') || item.snippet.title.length < 30;
+    const targetSection = isReel ? 'reels-section' : 'videos-section';
+    document.getElementById(targetSection).appendChild(card);
+  });
+}
+
+function createCard(item) {
+  const { videoId } = item.id;
+  const { title, thumbnails, channelTitle } = item.snippet;
+  const card = document.createElement('div');
+  card.className = 'video-card';
+  card.innerHTML = `
+    <img src="${thumbnails.medium.url}" alt="${title}">
+    <h4>${title}</h4>
+    <p>${channelTitle}</p>
+  `;
+  card.onclick = () => openModal(videoId, title, channelTitle);
+  return card;
+}
+
+// === MODAL LOGIC ===
+function openModal(vid, t, ch) {
+  const mod = document.getElementById('videoModal'),
+        vp = document.getElementById('introPlayer'),
+        yf = document.getElementById('youtubeFrame');
+
+  document.getElementById('modalTitle').textContent = t;
+  document.getElementById('modalChannel').textContent = `Channel: ${ch}`;
+  yf.style.display = 'none'; yf.src = '';
+  vp.style.display = 'block'; vp.src = './social plateforms/intro.mp4';
+
+  mod.classList.add('active');
+  vp.play();
+  vp.onended = () => {
+    vp.style.display = 'none'; vp.src = '';
+    yf.style.display = 'block'; yf.src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
+  };
+}
+
+function closeModal() {
+  document.getElementById('videoModal').classList.remove('active');
+  document.getElementById('introPlayer').src = '';
+  document.getElementById('youtubeFrame').src = '';
+}
+
+function toggleNotifications() {
+  document.getElementById('notifications').classList.toggle('active');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('lastSearchResults');
+  if (saved) renderVideos(JSON.parse(saved));
+  else renderVideos();
+});
+
+// === FULLSCREEN HANDLER ===
+function addFS(btn, ifr) {
+  btn.onclick = () => {
+    const r = ifr.requestFullscreen || ifr.webkitRequestFullscreen || ifr.mozRequestFullScreen || ifr.msRequestFullscreen;
+    if (r) r.call(ifr);
+  };
+}
+
+
+  // ==== YOUTUBE & SHORTS FETCH + CACHE + SCROLL PLAYBACK ====
+  const API_URL = 'http://localhost:5000/api/videos';
+  const API_CACHE_KEY = 'shortsCache';
+  const CACHE_DURATION_MS = 1000 * 60 * 60 * 5; // 5 hours
+
+  let players = {};
+  let playerCount = 0;
+
+  // 1) Load from cache or fetch anew
+  const cached = localStorage.getItem(API_CACHE_KEY);
+  if (cached) {
+    const { timestamp, data } = JSON.parse(cached);
+    if (Date.now() - timestamp < CACHE_DURATION_MS) {
+      renderShorts(data);
+    } else {
+      localStorage.removeItem(API_CACHE_KEY);
+      fetchShorts();
+    }
+  } else {
+    fetchShorts();
+  }
+
+  function fetchShorts() {
+    fetch(`${API_URL}?type=shorts`)
+      .then(r => r.json())
+      .then(d => {
+        localStorage.setItem(API_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data: d
+        }));
+        renderShorts(d);
+      })
+      .catch(console.error);
+  }
+
+  function renderShorts(d) {
+    const container = document.getElementById('shorts-list');
+    container.innerHTML = ''; // clear any existing
+    d.items.forEach(item => {
+      const vid = item.id.videoId;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'reel-item';
+      wrapper.dataset.videoId = vid;
+
+      // placeholder for YT player
+      const iframeDiv = document.createElement('div');
+      const pid = `player-${playerCount++}`;
+      iframeDiv.id = pid;
+      iframeDiv.style.width = '100%';
+      iframeDiv.style.height = '100vh';
+
+      const btn = document.createElement('button');
+      btn.className = 'fullscreen-btn';
+      btn.textContent = 'Fullscreen';
+
+      wrapper.append(iframeDiv, btn);
+      container.appendChild(wrapper);
+
+      players[pid] = { videoId: vid, wrapper, btn, iframeDiv };
+    });
+  }
+
+  // 2) Called by YouTube API when it's ready
+  window.onYouTubeIframeAPIReady = function ()  {
+    Object.entries(players).forEach(([pid, { videoId, wrapper, btn, iframeDiv }]) => {
+      const player = new YT.Player(pid, {
+        videoId,
+        height: '100%',
+        width: '100%',
+        playerVars: {
+          autoplay: 0,
+          mute: 1,
+          controls: 0,
+          loop: 1,
+          playlist: videoId,
+          modestbranding: 1,
+          rel: 0
+        },
+        events: {
+          onReady: e => setupObserver(wrapper, e.target)
+        }
+      });
+      // wire up fullscreen on the actual <iframe> once it's in the DOM
+      player.addEventListener('onReady', () => {
+        const actualIframe = iframeDiv.querySelector('iframe');
+        addFS(btn, actualIframe);
+      });
+      players[pid].player = player;
+    });
+  }
+
+  // 3) IntersectionObserver to play/pause
+  function setupObserver(wrapper, player) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting && en.intersectionRatio >= 0.6) {
+          player.playVideo();
+        } else {
+          player.pauseVideo();
+        }
+      });
+    }, { threshold: [0.6] });
+
+    obs.observe(wrapper);
+  }
+
+// === CHANNEL BY ID ===
+function fetchChannelVideos() {
+  const cid = document.getElementById('channelId').value.trim();
+  const cont = document.getElementById('channel-videos');
+  cont.innerHTML = '';
+  if (!cid) return alert('Enter a channel ID');
+
+  fetch(`${API_URL}?type=channel&channelId=${cid}`)
+    .then(r => r.json())
+    .then(d => {
+      if (!d.items || !d.items.length) {
+        cont.innerHTML = '<p>No videos found</p>';
+        return;
+      }
+      d.items.forEach(i => {
+        const vid = i.id.videoId;
+        const ifr = document.createElement('iframe');
+        ifr.src = `https://www.youtube.com/embed/${vid}`;
+        ifr.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        const btn = document.createElement('button');
+        btn.textContent = 'Fullscreen';
+        btn.className = 'fullscreen-btn';
+        addFS(btn, ifr);
+        const w = document.createElement('div');
+        w.className = 'video-wrapper';
+        w.append(ifr, btn);
+        cont.appendChild(w);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      cont.innerHTML = '<p>Error — check channel ID</p>';
+    });
+}
+
+// === TAB SWITCHING ===
+function showTab(tabName) {
+  document.querySelectorAll('.tab-button').forEach(btn => {
+    const match = btn.textContent.toLowerCase().includes(tabName);
+    btn.classList.toggle('active', match);
+  });
+
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.style.display = 'none';
+  });
+
+  const tab = document.getElementById(`tab-${tabName}`);
+  if (tab) tab.style.display = 'block';
+}
+  </script>
+</body>
+</html>

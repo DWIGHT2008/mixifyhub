@@ -1,0 +1,965 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+  }
+  
+  /* Body and background */
+  body {
+    background: #f4f6f8;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Header */
+  header {
+    background-color: #003366;
+    color: white;
+    padding: 20px 30px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  header h1 {
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 2.2rem;
+    letter-spacing: 1px;
+  }
+  
+  /* Source filter buttons */
+  .source-filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  
+  .source-filter button {
+    background-color: #00509e;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 25px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,80,158,0.3);
+  }
+  
+  .source-filter button:hover {
+    background-color: #0074d9;
+    box-shadow: 0 4px 12px rgba(0,116,217,0.4);
+  }
+  
+  /* Main news container */
+  .news-container {
+    max-width: 960px;
+    margin: 30px auto;
+    padding: 0 20px 40px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+  }
+  
+  /* Individual news cards */
+  .news-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  
+  .news-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  
+  .news-card h3 a {
+    color: #003366;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .news-card h3 a:hover {
+    color: #0074d9;
+    text-decoration: underline;
+  }
+  
+  .news-card p {
+    flex-grow: 1;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    color: #555;
+  }
+  
+  .news-card small {
+    font-size: 0.8rem;
+    color: #999;
+    text-align: right;
+    font-style: italic;
+  }
+  
+  /* Loading Overlay */
+  #loading-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    flex-direction: column;
+  }
+  
+  #loading-overlay video {
+    width: 250px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+  }
+  
+  #loading-overlay div {
+    margin-top: 20px;
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-shadow: 0 0 8px black;
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 480px) {
+    header h1 {
+      font-size: 1.6rem;
+    }
+    .source-filter button {
+      padding: 8px 14px;
+      font-size: 0.9rem;
+    }
+    .news-card {
+      padding: 15px 16px;
+    }
+  }
+  /* Menu Button */
+#menu-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    background: #1d3557;
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Sidebar Styles */
+  #settings-sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+    transition: right 0.3s ease;
+    padding: 2rem 1.5rem;
+    z-index: 999;
+    overflow-y: auto;
+  }
+  
+  #settings-sidebar.open {
+    right: 0;
+  }
+  
+  #settings-sidebar h2 {
+    margin-top: 0;
+    color: #202122;
+  }
+  
+  .sidebar-section {
+    margin-bottom: 2rem;
+  }
+  
+  #close-sidebar {
+    background: #e63946;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+
+  
+  /* Navigation */
+  ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    flex-wrap: wrap;
+  }
+  
+  ul li a, ul li button {
+    text-decoration: none;
+    color: #6f42c1;
+    font-weight: bold;
+    padding: 8px 16px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  ul li a:hover,
+  ul li button:hover {
+    background-color: #6f42c1;
+    color: white;
+    border-color: #6f42c1;
+  }
+  /* Container <ul> styles for positioning if needed */
+ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem; /* space between icons */
+    padding: 0;
+    margin: 0;
+    align-items: center;
+  }
+  
+  /* Individual <li> */
+  li {
+    display: inline-block;
+  }
+  
+  /* Anchor styling (optional if hover or spacing needed) */
+  li a {
+    display: inline-block;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Image styling */
+  li a img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+  
+  /* Hover effect for icon */
+  li a:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* or dark theme alternative */
+  }
+  
+  li a:hover img {
+    transform: scale(1.1);
+  }
+  /* General <ul> container */
+ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* <li> styling */
+  li {
+    display: inline-block;
+  }
+  
+  /* Logout button styling */
+  #logout {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Image inside button */
+  #logout img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+  }
+  
+  /* Hover effect */
+  #logout:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* light theme */
+  }
+  
+  #logout:hover img {
+    transform: scale(1.1);
+  }
+  body.dark-mode #logout:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  
+
+
+
+
+  .news-search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem auto;
+    padding: 0.75rem 1rem;
+    max-width: 600px;
+    background-color: #f0f0f0;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease;
+  }
+
+  .news-search input[type="text"] {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    outline: none;
+    background-color: transparent;
+    color: #333;
+  }
+
+  .news-search input::placeholder {
+    color: #888;
+  }
+
+  .news-search button {
+    padding: 0.6rem 1.2rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .news-search button:hover {
+    background-color: #0056b3;
+  }
+
+  /* Dark mode compatibility */
+  body.dark-mode .news-search {
+    background-color: #222;
+  }
+
+  body.dark-mode .news-search input[type="text"] {
+    color: #f9f9f9;
+  }
+
+  body.dark-mode .news-search input::placeholder {
+    color: #ffffff;
+  }
+
+  .team-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .team-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+  }
+  .standings-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .standings-table th, .standings-table td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: center;
+  }
+  .standings-table th {
+    background-color: #f0f0f0;
+  }
+  /* Container for the entire football section */
+#football-section {
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-width: 900px;
+  margin-top: 15px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Style the buttons that toggle content */
+#football-section button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  margin-right: 10px;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#football-section button:hover {
+  background-color: #0056b3;
+}
+
+/* Active button style */
+#football-section button.active {
+  background-color: #004080;
+}
+
+/* Content area where teams/standings/matches are shown */
+#football-content {
+  margin-top: 20px;
+  min-height: 300px; /* or adjust as needed */
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  #football-section button {
+    padding: 8px 14px;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+}
+/* Scope all styles under #football-content to avoid affecting other parts of your site */
+#football-content {
+  display: flex;
+  flex-wrap: wrap;        /* Wrap items if too wide */
+  gap: 20px;              /* Space between cards */
+  justify-content: flex-start;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  min-height: 300px;      /* Enough space for content */
+  overflow-y: auto;       /* Scroll if content is tall */
+}
+
+/* Each item (team, standing row, match card) container */
+#football-content .football-item {
+  background: #f4f6f8;
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex: 1 1 250px;        /* Flexible width, min 250px */
+  max-width: 300px;       /* Prevent too wide */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Example for team logo + name */
+#football-content .football-item .team-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  align-self: center;
+}
+
+/* Headings inside item */
+#football-content .football-item h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* Paragraphs/details */
+#football-content .football-item p {
+  font-size: 0.9rem;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+/* For standings table inside content */
+#football-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+#football-content table thead tr {
+  background-color: #007bff;
+  color: white;
+}
+
+#football-content table th, 
+#football-content table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+/* Alternate row shading */
+#football-content table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  #football-content {
+    flex-direction: column;
+  }
+  
+  #football-content .football-item {
+    max-width: 100%;
+  }
+}
+
+/* Base container and items */
+#football-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  min-height: 300px;
+  overflow-y: auto;
+  /* Fade in container on load */
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Individual football item with scale and shadow on hover */
+#football-content .football-item {
+  background: #f4f6f8;
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex: 1 1 250px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: default;
+
+  /* Smooth entrance */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+  animation-delay: var(--delay, 0s); /* Custom delay per item */
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover effect: scale and shadow pop */
+#football-content .football-item:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  transform: scale(1.05);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Team logo with subtle float animation */
+#football-content .football-item .team-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  align-self: center;
+  animation: floatUpDown 3s ease-in-out infinite;
+}
+
+/* Headings inside item */
+#football-content .football-item h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #ffffff;
+  text-align: center;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+#football-content .football-item:hover h3 {
+  color: #007bff;
+}
+
+/* Paragraphs/details */
+#football-content .football-item p {
+  font-size: 0.9rem;
+  color: #ffffff;
+  line-height: 1.3;
+  user-select: none;
+}
+
+/* Table styling with fade-in */
+#football-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: #ffffff;
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+  animation-delay: 0.4s;
+}
+
+#football-content table thead tr {
+  background-color: #007bff;
+  color: white;
+}
+
+#football-content table th, 
+#football-content table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+#football-content table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#football-content table tbody tr:hover {
+  background-color: #e3f2fd;
+  cursor: pointer;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  #football-content {
+    flex-direction: column;
+  }
+  
+  #football-content .football-item {
+    max-width: 100%;
+  }
+}
+
+
+/* Animations */
+
+/* Fade in + slide up */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Simple float up/down for logos */
+@keyframes floatUpDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+/* Container for matches: flex column with gap */
+#football-content.matches {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #fefefe;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  animation: fadeInScale 0.6s ease forwards;
+}
+
+/* Each match card */
+#football-content.matches .match-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+
+  /* Initial state for entrance */
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  animation: fadeInUp 0.5s ease forwards;
+  animation-delay: var(--delay, 0s);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Hover effect: lift and glow */
+#football-content.matches .match-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+  background-color: #e6f0ff;
+  transform: translateY(0) scale(1.03);
+}
+
+/* Match details flex */
+.match-card .team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Team logos float animation */
+.match-card .team-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  animation: floatUpDown 3s ease-in-out infinite;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: white;
+  padding: 5px;
+}
+
+/* Team names */
+.match-card .team-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #ffffff;
+  user-select: none;
+}
+
+/* Match score */
+.match-card .score {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #007bff;
+  user-select: none;
+  min-width: 60px;
+  text-align: center;
+  letter-spacing: 1.5px;
+}
+
+/* Match date/time */
+.match-card .match-time {
+  font-size: 0.85rem;
+  color: #ffffff;
+  user-select: none;
+  white-space: nowrap;
+  margin-left: 15px;
+}
+
+/* Scrollbar style for container */
+#football-content.matches::-webkit-scrollbar {
+  width: 8px;
+}
+#football-content.matches::-webkit-scrollbar-track {
+  background: transparent;
+}
+#football-content.matches::-webkit-scrollbar-thumb {
+  background: #007bff66;
+  border-radius: 4px;
+}
+
+/* Animations */
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatUpDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+/* Football content container when showing matches */
+#football-content.matches {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;             /* nice spacing between matches */
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  border-radius: 12px;
+  color: #ffffff;
+  max-height: 450px;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(42, 82, 152, 0.6);
+  animation: fadeInSlide 0.6s ease forwards;
+}
+
+/* Individual match card */
+#football-content.matches .match-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 14px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgb(255 255 255 / 0.1);
+  cursor: pointer;
+
+  /* start slightly transparent and shifted down */
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeInUp 0.5s ease forwards;
+  animation-delay: var(--delay, 0s);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Hover effect */
+#football-content.matches .match-card:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 28px rgba(255 255 255 / 0.3);
+  transform: translateY(0) scale(1.05);
+  color: #ffd700;
+}
+
+/* Teams group */
+.match-card .team {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Team logo with subtle floating */
+.match-card .team-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  padding: 6px;
+  object-fit: contain;
+  box-shadow: 0 0 8px rgba(255 255 255 / 0.4);
+  animation: floatUpDown 3.2s ease-in-out infinite;
+}
+
+/* Team name text */
+.match-card .team-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  user-select: none;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Score styling */
+.match-card .score {
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #ffd700;
+  min-width: 70px;
+  text-align: center;
+  user-select: none;
+  letter-spacing: 2px;
+}
+
+/* Match date/time */
+.match-card .match-time {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  user-select: none;
+  white-space: nowrap;
+  margin-left: 18px;
+  font-style: italic;
+}
+
+/* Scrollbar styling */
+#football-content.matches::-webkit-scrollbar {
+  width: 9px;
+}
+
+#football-content.matches::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#football-content.matches::-webkit-scrollbar-thumb {
+  background: #ffd70088;
+  border-radius: 5px;
+}
+
+/* Keyframe animations */
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes floatUpDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}

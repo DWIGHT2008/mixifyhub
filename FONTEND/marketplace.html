@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mixifyhub/marketplace</title>
+  <link rel="stylesheet" href="marketplace.css">
+  <style>
+   
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="back-button" onclick="history.back()">↩️</span> 
+<ul>
+  <li><a href="dashboard.html"><img src="./support icons/home (2).png" alt="home" id="logoutBtn" title="Home" /></a></li>
+   <li><a href="analytics.html"><img src="./support icons/sales-report.png" alt="analytics" id="logoutBtn" title="Analytics" /></a></li>
+  <li><a href="connectedaccounts.html"><img src="./support icons/internet.png" alt="connected accounts" id="logoutBtn" title="connected accounts" /></a></li>
+  <li><a href="leaderboard.html"><img src="./support icons/podium (1).png" alt="leader board" id="logoutBtn" title="leader board" /></a></li>
+  <li><a href="information.html"><img src="./support icons/mail.png" alt="information" id="logoutBtn" title="Updates" /></a></li>
+  <li><a href="news.html"><img src="./support icons/global-news.png" alt="news" id="logoutBtn" title="News" /></a></li>
+  <li><a href="profile.html"><img src="./support icons/setting.png" alt="settings" id="logoutBtn" title="Settings" /></a></li>
+  <li><button id="logout"><img src="./support icons/log-out (1).png" alt="Log Out" id="logoutBtn" title="Log Out" /></button></li>
+  <div class="theme-toggle">
+    <label class="switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider round"></span>
+    </label>
+  </div>
+</ul>
+</div>
+
+<div id="avatarModal" style="display: none;">
+<img id="largeAvatar" alt="Large Avatar View">
+</div>
+
+  <h1>Product Search and Showcase</h1>
+</header>
+
+<div class="search-container">
+  <input type="text" id="searchKeyword" placeholder="Search products..." />
+  <select id="categoryFilter">
+    <option value="">Select Category</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Accessories">Accessories</option>
+    <option value="Clothing">Clothing</option>
+    <!-- Add more categories as needed -->
+  </select>
+  <select id="platformFilter">
+    <option value="">Select Platform</option>
+    <option value="Amazon">Amazon</option>
+    <option value="eBay">eBay</option>
+    <option value="AliExpress">AliExpress</option>
+  </select>
+  <button onclick="searchProducts()">Search</button>
+</div>
+
+<div class="products-container" id="products"></div>
+
+<!-- AI Assistant Floating Button -->
+<div id="aiAssistant">
+  <span><img src="./support icons/chat-bot.png" alt="Log Out" id="logoutBtn" title="Log Out" /></span>
+</div>
+
+<!-- AI Assistant Chat Window -->
+<div id="aiAssistantWindow">
+  <h3>AI Assistant</h3>
+  <div id="chatArea">
+    
+    <p><strong>Assistant</strong>
+      <p>If the information provided to you by our AI assistant is irrelevant to what you need or require please kindly contact us through our emails below
+      ...Sorry for any inconveniences in advance we are trying our level best to fix and make our site user friendly to all at large. Thank you..</p>
+    <p>Email: <a href="mailto:mixifyhub7@gmail.com">mixifyhub@support.com</a></p>
+    <p>Email: <a href="mailto:dwightkim12@gmail.com">mixifyhub@developersupportaccount.com</a></p>
+    <p><strong>Assistant:</strong> Hello! How can I assist you today?</p>
+  </div>
+  <input type="text" id="chatInput" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+  
+</div>
+
+<script>
+
+  const toggle = document.getElementById('themeToggle');
+  const isDark = localStorage.getItem('theme') === 'dark';
+
+  if (isDark) {
+    document.body.classList.add('dark');
+    toggle.checked = true;
+  }
+
+  toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+
+
+  // AI Assistant Interaction
+  const aiAssistantButton = document.getElementById('aiAssistant');
+  const aiAssistantWindow = document.getElementById('aiAssistantWindow');
+  const chatArea = document.getElementById('chatArea');
+  const chatInput = document.getElementById('chatInput');
+
+  aiAssistantButton.addEventListener('click', () => {
+    aiAssistantWindow.style.display = aiAssistantWindow.style.display === 'none' || aiAssistantWindow.style.display === '' ? 'flex' : 'none';
+  });
+
+  function sendMessage() {
+    const userMessage = chatInput.value;
+    if (!userMessage) return;
+
+    chatArea.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
+    chatInput.value = '';
+
+    // Simulated AI Assistant Response
+    setTimeout(() => {
+      const aiMessage = getAIResponse(userMessage);
+      chatArea.innerHTML += `<p><strong>AD-Assistant:</strong> ${aiMessage}</p>`;
+      chatArea.scrollTop = chatArea.scrollHeight; // Scroll to bottom
+    }, 1000);
+  }
+
+  function getAIResponse(message) {
+    const msg = message.toLowerCase();
+  
+    if (msg.includes('help') || msg.includes('hello') || msg.includes('hi')) {
+      return 'Hi there! 👋 How can I help you with product searches, prices, or platform info?';
+    }
+  
+    if (msg.includes('price')) {
+      return 'I can help you compare prices across Amazon, eBay, and AliExpress.';
+    }
+  
+    if (msg.includes('category') || msg.includes('type')) {
+      return 'You can search by category like Electronics, Fashion, Accessories, etc.';
+    }
+  
+    if (msg.includes('platform') || msg.includes('amazon') || msg.includes('ebay') || msg.includes('aliexpress')) {
+      return 'Currently, we support products from Amazon, eBay, and AliExpress. More coming soon!';
+    }
+  
+    if (msg.includes('discount') || msg.includes('offer') || msg.includes('deal')) {
+      return 'Great! You can check the product cards for the latest offers and flash sales.';
+    }
+  
+    if (msg.includes('track') || msg.includes('order')) {
+      return 'This app currently doesn’t support order tracking. Try checking the retailer’s website directly.';
+    }
+  
+    if (msg.includes('recommend') || msg.includes('suggest')) {
+      return 'Try searching for "top rated" or "best selling" in the search bar to get suggestions!';
+    }
+  
+    return 'Hmm... I’m not sure how to respond to that. Could you ask me something about products, prices, or platforms?';
+  }
+
+  // Product Search Functions (Existing)
+  const platforms = {
+    amazon: {
+      name: 'Amazon',
+      apiEndpoint: 'https://api.example.com/amazon', // Replace with actual API
+      appId: 'YOUR_AMAZON_APP_ID',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
+    },
+    ebay: {
+      name: 'eBay',
+      apiEndpoint: 'https://api.ebay.com/buy/browse/v1/item_summary/search',
+      appId: '8af8a707-93f8-4f4d-8969-f792316998af', // optional unless you use headers directly
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/eBay_logo.svg',
+    },
+    aliexpress: {
+      name: 'AliExpress',
+      apiEndpoint: 'https://api.example.com/aliexpress', // Replace with actual API
+      appId: 'YOUR_ALIEXPRESS_APP_ID',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/AliExpress_logo.svg',
+    }
+  };
+
+  function fetchProductFromPlatform(platform, keyword, category, allProducts) {
+    if (platform.name === 'eBay') {
+      const endpoint = `http://localhost:5000/api/ebay-search?keyword=${encodeURIComponent(keyword)}`;
+      fetch(endpoint)
+        .then(res => res.json())
+        .then(data => {
+          const items = data.itemSummaries || [];
+          items.forEach(item => {
+            allProducts.push({
+              title: item.title,
+              imageURL: item.image?.imageUrl || 'assets/placeholder.png',
+              price: item.price?.value + ' ' + item.price?.currency,
+              productURL: item.itemWebUrl,
+              platform: platform.name,
+              offer: item.marketingPrice?.discountAmount?.value ? `Discount: ${item.marketingPrice.discountAmount.value} ${item.price.currency}` : 'No current special offers',
+            });
+          });
+        })
+        .catch(error => {
+          console.error(`${platform.name} API Error:`, error);
+        });
+      return;
+    }
+    // Fallback for Amazon or AliExpress
+    const endpoint = `${platform.apiEndpoint}?keywords=${encodeURIComponent(keyword)}&category=${category}&appId=${platform.appId}`;
+    fetch(endpoint)
+      .then(res => res.json())
+      .then(data => {
+        const products = data.items || [];
+        products.forEach(product => {
+          product.platform = platform.name;
+          allProducts.push(product);
+        });
+      })
+      .catch(error => {
+        console.error(`${platform.name} API Error:`, error);
+      });
+  }
+  
+  function searchProducts() {
+    const keyword = document.getElementById('searchKeyword').value;
+    const category = document.getElementById('categoryFilter').value;
+    const platform = document.getElementById('platformFilter').value;
+
+    const allProducts = [];
+    let amazonFilter = '';
+
+    if (platform === 'Amazon') {
+      amazonFilter = 'prime'; // Example: Filter for Amazon Prime products
+    }
+
+    if (platform) {
+      fetchProductFromPlatform(platforms[platform.toLowerCase()], keyword, category, allProducts, amazonFilter);
+    } else {
+      Object.values(platforms).forEach(platform => {
+        fetchProductFromPlatform(platform, keyword, category, allProducts, amazonFilter);
+      });
+    }
+
+    // Display the fetched products
+    setTimeout(() => displaySortedProducts(allProducts), 1000); // Add delay to allow fetching
+  }
+
+  function displaySortedProducts(products) {
+    const container = document.getElementById('products');
+    container.innerHTML = ''; // Clear previous results
+
+    products.forEach(product => {
+      const title = product.title;
+      const image = product.imageURL || 'assets/placeholder.png';
+      const price = product.price;
+      const link = product.productURL;
+      const offer = product.offer ? `<div class="offer">${product.offer}</div>` : '';
+
+      const card = document.createElement('div');
+      card.className = 'product-card';
+
+      card.innerHTML = `
+        <a href="${link}" target="_blank">
+          <img src="${image}" alt="${title}" />
+          <h3>${title}</h3>
+          <div class="price">${price}</div>
+          ${offer}
+          <div class="platform">
+            <img src="${platforms[product.platform.toLowerCase()].logo}" alt="${product.platform}" style="width: 20px; margin-right: 5px;" />
+            ${product.platform}
+          </div>
+        </a>
+      `;
+      
+      container.appendChild(card);
+    });
+  }
+</script>
+
+
+</body>
+</html>

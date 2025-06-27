@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MixifyHub AI Assistant</title>
+  <link rel="stylesheet" href="mixifyHubai.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Highlight.js CSS (choose any theme, this is GitHub dark) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+
+<!-- Highlight.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+<script src="https://unpkg.com/@picovoice/web-voice-processor"></script>
+<script src="https://unpkg.com/@picovoice/porcupine-web-en-worker"></script>
+<script src="https://unpkg.com/@picovoice/porcupine-web"></script>
+</head>
+<body class="theme-light">
+  <h2 class="heading">MixifyHub AI Assistant 🤖</h2>
+
+  <!-- Sidebar -->
+  <div class="fixed top-0 left-0 h-full z-50">
+    <div id="sidebar" class="w-64 min-h-screen bg-white dark:bg-gray-800 p-4 space-y-4 transition-all duration-300">
+     <span class="back-button" onclick="history.back()">↩️</span>
+    <button onclick="toggleSidebar()" class="mb-4 text-left">☰</button>
+
+    <a href="dashboard.html" class="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded">
+      <span>🏠</span><span class="label">Home</span>
+    </a>
+    <a href="images.html" class="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded">
+      <span>📁</span><span class="label">Generate Images</span>
+    </a>
+    <a href="profile.html" class="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded">
+      <span>⚙️</span><span class="label">Settings</span>
+    </a>
+
+    <div class="theme-selector">
+      <label>Select Theme:</label>
+      <select id="themeSelect">
+        <option value="theme-light">Light</option>
+        <option value="theme-dark">Dark</option>
+        <option value="theme-forest">Forest</option>
+        <option value="theme-pink">Pink</option>
+        <option value="theme-red">Red</option>
+        <option value="theme-white">White</option>
+      </select>
+    </div>
+
+    <div class="personality-selector">
+      <label for="personalitySelect">🧠 Personality:</label>
+      <select id="personalitySelect">
+        <option value="friendly">😊 Friendly</option>
+        <option value="funny">😂 Funny</option>
+        <option value="professional">💼 Professional</option>
+        <option value="motivational">💪 Motivational</option>
+      </select>
+    </div>
+
+    <div style="text-align:center; margin-top:12px;">
+      <label for="langSelect">🎙️ Voice Input Language:</label>
+      <select id="langSelect">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="fr-FR">Français (FR)</option>
+        <option value="es-ES">Español (ES)</option>
+        <option value="sw-KE">Swahili (KE)</option>
+        <option value="de-DE">Deutsch (DE)</option>
+      </select>
+    
+      <select id="voiceSelect" class="p-1 rounded text-sm bg-gray-800 text-white">
+        <option value="Google UK English Male">Calm Male</option>
+        <option value="Google US English Female">Friendly Female</option>
+        <option value="premium-funny-voice">Funny Voice (PRO)</option>
+      </select>
+    
+      <label style="margin-left:10px;">
+        🔊 <input type="checkbox" id="ttsToggle" checked> Speak Replies
+      </label>
+    </div>
+    
+    <hr>
+    <hr>
+    <button id="newChatBtn" class="w-full bg-blue-500 text-white p-2 rounded">➕ New Chat</button>
+    <ul id="chatList" class="space-y-2 mt-4"></ul>
+  </div>
+</div>
+
+  <div id="chatbox" class="chatbox"> </div>
+
+  <div class="input-area">
+    <textarea id="userInput" placeholder="Ask something..." rows="1"></textarea>
+    <button id="micBtn" title="Speak your question 🎤">🎤</button>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+ <!-- Ad Modal -->
+ 
+<!-- Move this outside of #chatbox and place it just before </body> -->
+
+<div id="adModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[9999]">
+  <div id="adContent" class="bg-white dark:bg-gray-800 p-6 rounded shadow-lg text-center max-w-md w-full mx-4">
+    <p class="mb-4 text-lg">Hi there friend 😴<br>💤 I'm tired. Please watch this video to recharge me! ⚡</p>
+    <button onclick="watchAd()" class="bg-blue-600 text-white px-4 py-2 rounded">Watch Video</button>
+  </div>
+</div>
+
+  <script src="main.js"></script>
+</body>
+</html>

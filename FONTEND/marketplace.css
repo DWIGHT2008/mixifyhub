@@ -1,0 +1,352 @@
+/* General Reset & Body Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    padding: 20px;
+  }
+  
+  /* Header */
+  header {
+    text-align: center;
+    padding: 20px;
+    background-color: #6f42c1;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  /* Navigation */
+  ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    flex-wrap: wrap;
+  }
+  
+  ul li a, ul li button {
+    text-decoration: none;
+    color: #6f42c1;
+    font-weight: bold;
+    padding: 8px 16px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  ul li a:hover,
+  ul li button:hover {
+    background-color: #6f42c1;
+    color: white;
+    border-color: #6f42c1;
+  }
+  
+  /* Search Container */
+  .search-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-container input,
+  .search-container select,
+  .search-container button {
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .search-container button {
+    background-color: #6f42c1;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .search-container button:hover {
+    background-color: #5a379c;
+  }
+  
+  /* Product Cards */
+  .products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  
+  .product-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .product-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+  
+  .product-card h3 {
+    font-size: 1rem;
+    margin: 10px 0;
+    height: 40px;
+    overflow: hidden;
+  }
+  
+  .product-card .price {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #28a745;
+  }
+  
+  .product-card .offer {
+    background: #ffc107;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin-bottom: 5px;
+    display: inline-block;
+  }
+  
+  .product-card .platform {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: #555;
+  }
+  
+  /* AI Assistant Floating Button */
+  #aiAssistant {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #6f42c1;
+    color: white;
+    padding: 15px;
+    border-radius: 50%;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    z-index: 999;
+  }
+  
+  /* AI Assistant Chat Window */
+  #aiAssistantWindow {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 300px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    padding: 15px;
+    display: none;
+    flex-direction: column;
+    z-index: 999;
+  }
+  
+  #aiAssistantWindow h3 {
+    margin-bottom: 10px;
+    color: #6f42c1;
+    text-align: center;
+  }
+  
+  #chatArea {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 6px;
+  }
+  
+  #chatArea p {
+    margin: 5px 0;
+  }
+  
+  #chatInput {
+    padding: 8px;
+    width: 100%;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  #aiAssistantWindow button {
+    padding: 10px;
+    background: #6f42c1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  #aiAssistantWindow button:hover {
+    background: #5a379c;
+  }
+
+
+
+  /* Theme Toggle Switch */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+  }
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    background-color: #ccc;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #0078d7;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(22px);
+  }
+  
+  /* DARK MODE STYLES */
+  body.dark {
+    background-color: #121212;
+    color: #eee;
+  }
+  
+  body.dark header {
+    background-color: #1e1e1e;
+  }
+  
+  body.dark ul {
+    background-color: #2c2c2c;
+  }
+  
+  body.dark ul li a,
+  body.dark ul li button {
+    background-color: #333;
+    color: #fff;
+  }
+  
+  body.dark .search-container input,
+  body.dark .search-container select,
+  body.dark .search-container button {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+  }
+  
+  body.dark .products-container .product-card {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #333;
+  }
+  
+  body.dark #aiAssistantWindow {
+    background-color: #1e1e1e;
+    color: #eee;
+    border-color: #444;
+  }
+
+
+
+  body.dark #aiAssistantWindow {
+    background-color: #1e1e1e;
+    color: #eee;
+    border-color: #444;
+  }
+  
+  body.dark #aiAssistantWindow .chat-messages {
+    color: #eee;
+  }
+  
+  body.dark #aiAssistantWindow .chat-message {
+    color: #eee;
+  }
+  
+  body.dark #aiAssistantWindow input,
+  body.dark #aiAssistantWindow textarea {
+    background-color: #2a2a2a;
+    color: #eee;
+    border: 1px solid #444;
+  }
+  
+  body.dark #aiAssistantWindow a {
+    color: #88aaff;
+  }
+  
+  body.dark #aiAssistantWindow h3 {
+    color: #b3aaff;
+  }
+
+  #logoutBtn {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  #logoutBtn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 0, 0, 0.1); /* Optional red tint */
+  }

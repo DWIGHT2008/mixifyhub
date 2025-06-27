@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help Center</title>
+  <link rel="stylesheet" href="help.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>Help Center</h1>
+    <span class="back-button" onclick="history.back()">↩️</span> 
+    <input type="text" placeholder="Search help topics..." class="search-bar" />
+  </header>
+  <div class="dvi">
+    <h1>Recover Email Help</h1>
+  
+    <div class="container">
+      <h2>MixifyHub - Email Recovery Help</h2>
+  
+      <div class="tabs">
+        <div class="tab active" onclick="showSection('overview')">Overview & How It Works</div>
+        <div class="tab" onclick="showSection('tips')">Tips & FAQs</div>
+        <div class="tab" onclick="showSection('storage')">Storage Reason & Privacy</div>
+      </div>
+  
+      <!-- Section 1 -->
+      <div id="overview" class="content-section active">
+        <h3>Overview</h3>
+        <p>The Recover Email feature helps users regain access to their accounts by attempting to retrieve the most recently used email address associated with a login attempt. This process is limited and depends on recent activity.</p>
+  
+        <h3>How It Works</h3>
+        <ul>
+          <li>Only the most recently used email is temporarily stored.</li>
+          <li>If a recent login was detected, that email is used for recovery.</li>
+          <li>If no match is found, the system redirects to registration.</li>
+        </ul>
+  
+        <div class="diagram-container">
+          <div class="diagram-box">
+            ➜ User clicks "Recover Email" on the login screen and enters their username, password, and optional email hint.
+          </div>
+          <div class="diagram-arrow">▼</div>
+          <div class="diagram-box">
+            ➜ System checks localStorage/sessionStorage for a recently used email.
+          </div>
+          <div class="diagram-arrow">▼</div>
+          <div class="diagram-box">Was a recent email used?</div>
+          <div class="diagram-options">
+            <div>✅ <strong>If Yes:</strong> Autofills and logs the user in.</div>
+            <div>❌ <strong>If No:</strong> Redirects the user to the Register page.</div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Section 2 -->
+      <div id="tips" class="content-section">
+        <h3>Tips for Successful Recovery</h3>
+        <ul>
+          <li>Use the same device and browser you logged in with previously.</li>
+          <li>Ensure cookies or local storage are not cleared.</li>
+          <li>Try to recall the email or email clues used last.</li>
+        </ul>
+  
+        <h3>Frequently Asked Questions</h3>
+        <p><strong>Q: What if I haven’t logged in recently?</strong><br>
+          A: If no recent email is found, the system can't recover it. You should register again using a valid email.</p>
+  
+        <p><strong>Q: Is my email stored permanently?</strong><br>
+          A: It is stored <strong>temporarily</strong> for recovery and <strong>permanently</strong> for login and communication purposes.</p>
+  
+        <video controls width="100%" src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+      </div>
+  
+      <!-- Section 3 -->
+      <div id="storage" class="content-section">
+        <h3>Why Is My Email Stored?</h3>
+        <p>Understanding email storage enhances your privacy and security awareness.</p>
+  
+        <h4>📬 Temporary Storage (Recovery)</h4>
+        <ul>
+          <li><strong>Privacy:</strong> Short-term storage only.</li>
+          <li><strong>Session-based:</strong> Used if recently linked to a session.</li>
+          <li><strong>Security:</strong> Prevents brute-force or abuse.</li>
+        </ul>
+  
+        <h4>🔐 Permanent Storage (Login)</h4>
+        <ul>
+          <li><strong>Identity:</strong> Email is your login ID.</li>
+          <li><strong>Communication:</strong> For alerts and recovery.</li>
+          <li><strong>Verification:</strong> Proves account ownership.</li>
+        </ul>
+  
+        <h4>🔍 Summary Table</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Purpose</th>
+              <th>Storage Type</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Recover Email</td>
+              <td>Temporary</td>
+              <td>Used briefly for recent activity.</td>
+            </tr>
+            <tr>
+              <td>Login Access</td>
+              <td>Permanent</td>
+              <td>For identity and communication.</td>
+            </tr>
+          </tbody>
+        </table>
+  
+        <img src="https://via.placeholder.com/700x300?text=Email+Storage+Flowchart" alt="Email Storage Diagram" />
+      </div>
+  
+      <a class="back-link" href="recover-email.html">&larr; Back to Recovery Form</a>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <main class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <button class="faq-question">How do I reset my password?</button>
+      <div class="faq-answer">
+        <p>Go to your account settings and click on “Reset Password.”</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">How do I contact support?</button>
+      <div class="faq-answer">
+        <p>Click the Contact Us button below or email support@example.com.</p>
+      </div>
+    </div>
+
+    <button class="contact-button">Contact Us</button>
+  </main>
+
+  <footer>
+    <a href="privacy.html">Privacy Policy</a>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const answer = button.nextElementSibling;
+        answer.classList.toggle('visible');
+      });
+    });
+    
+        function showSection(id) {
+          document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+          document.getElementById(id).classList.add('active');
+        }
+      
+  </script>
+</body>
+</html>

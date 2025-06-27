@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>News Loader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind for styling -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-4">
+
+  <!-- News Container -->
+  <div id="news-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <!-- News items inserted here -->
+  </div>
+
+  <script>
+    async function loadNews() {
+      try {
+        const source = 'newsapi'; // or 'gnews', 'guardian', etc.
+        const res = await fetch(`http://localhost:5000/api/news?source=${source}`);
+        const data = await res.json();
+        const newsContainer = document.getElementById('news-container');
+        newsContainer.innerHTML = '';
+
+        const newsItems = data.articles?.slice(0, 4) || [];
+
+        newsItems.forEach(news => {
+          const item = document.createElement('div');
+          item.className = "p-3 bg-gray-100 dark:bg-gray-800 rounded-lg hover:shadow transition";
+
+          item.innerHTML = `
+            ${news.urlToImage ? `
+              <a href="${news.url}" target="_blank" rel="noopener">
+                <img src="${news.urlToImage}" alt="Image for ${news.title}" class="w-full h-40 object-cover rounded-md mb-3" />
+              </a>
+            ` : ''}
+            <a href="${news.url}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 font-medium text-lg hover:underline">
+              ${news.title}
+            </a>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${news.source?.name || ''}</p>
+          `;
+
+          newsContainer.appendChild(item);
+        });
+      } catch (error) {
+        console.error('Failed to load news:', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadNews);
+  </script>
+
+</body>
+</html>

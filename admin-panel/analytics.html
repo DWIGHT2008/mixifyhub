@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Analytics</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <h1>Analytics</h1>
+  <div id="metrics">
+    <p>Total Users: <span id="totalUsers">0</span></p>
+    <p>New This Week: <span id="newUsers">0</span></p>
+    <p>Active Today: <span id="activeUsers">0</span></p>
+    <p>Banned Users: <span id="bannedUsers">0</span></p>
+    <p>Total Posts: <span id="totalPosts">0</span></p>
+    <p>Total Comments: <span id="totalComments">0</span></p>
+  </div>
+
+  <canvas id="userChart" width="600" height="300"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/analytics.js"></script>
+</body>
+</html>

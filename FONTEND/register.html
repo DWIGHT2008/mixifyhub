@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MixifyHub — Login / Register</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+
+  <main class="container" role="main" aria-label="User authentication page">
+
+    <button id="modeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">☀️</button>
+  
+    <nav class="tabs" role="tablist" aria-label="Login and registration tabs">
+      <div
+        role="tab"
+        id="tab-login"
+        tabindex="0"
+        aria-selected="true"
+        aria-controls="loginForm"
+        class="tab"
+      >
+        Login
+      </div>
+      <div
+        role="tab"
+        id="tab-register"
+        tabindex="-1"
+        aria-selected="false"
+        aria-controls="registerForm"
+        class="tab"
+      >
+        Register
+      </div>
+    </nav>
+  
+    <!-- LOGIN FORM -->
+    <form id="loginForm" class="active" aria-labelledby="tab-login" novalidate>
+      <label for="loginEmail">Email address</label>
+      <input
+        type="email"
+        id="loginEmail"
+        name="loginEmail"
+        required
+        autocomplete="email"
+        aria-required="true"
+        aria-invalid="false"
+        placeholder="email@example.com"
+      />
+  
+      <label for="loginPassword">Password</label>
+      <div class="password-container">
+        <input
+          type="password"
+          id="loginPassword"
+          name="loginPassword"
+          required
+          aria-required="true"
+          aria-invalid="false"
+          minlength="8"
+          maxlength="64"
+          placeholder="Enter your password"
+        />
+        <button type="button" class="password-toggle" aria-label="Show password" id="toggleLoginPassword">Show</button>
+      </div>
+  
+      <button class="btn" type="submit" id="loginSubmit" disabled>Log In</button>
+  
+      <div class="social-login">
+        <button class="social-btn facebook">Facebook</button>
+        <button class="social-btn google" type="button" id="googleLoginBtn">Login with Google</button>
+      </div>
+
+      
+      <div class="recover-link">
+        <p>Forgot your email? <a href="recover-email.html">Recover it here</a></p>
+      
+        <p>Forgot your password? <a type="button" onclick="window.location.href='login-with-clue.html'">use password clue</a></p>
+      </div>
+     <!-- Inside your login.html -->
+     
+    </form>
+    
+    <!-- REGISTER FORM -->
+    <form id="registerForm" aria-labelledby="tab-register" novalidate>
+      <label for="registerName">Full name</label>
+      <input
+      type="text"
+      id="registerName"
+      name="username"
+        required
+        aria-required="true"
+        aria-invalid="false"
+        autocomplete="name"
+        minlength="3"
+        placeholder="Your full name"
+      />
+  
+      
+
+<div class="voice-btn" id="registerVoiceBtn" role="button" tabindex="0" aria-pressed="false" aria-label="Activate voice input for full name">
+  🎤 <span>Speak your full name</span> <span class="mic-anim" aria-hidden="true"></span>
+</div>
+      <label for="registerEmail">Email address</label>
+      <input
+        type="email"
+        id="registerEmail"
+        name="registerEmail"
+        required
+        aria-required="true"
+        aria-invalid="false"
+        autocomplete="email"
+        placeholder="email@example.com"
+      />
+  
+      <label for="registerPassword">Password</label>
+      <div class="password-container">
+        <input
+          type="password"
+          id="registerPassword"
+          name="registerPassword"
+          required
+          aria-required="true"
+          aria-invalid="false"
+          minlength="8"
+          maxlength="64"
+          placeholder="Create a strong password"
+          aria-describedby="passwordHelp passwordStrengthText"
+        />
+        <button type="button" class="password-toggle" aria-label="Show password" id="toggleRegisterPassword">Show</button>
+      </div>
+      
+      <input type="text" id="registerClue" placeholder=" passwordclue" />
+      <div class="strength-bar" id="passwordStrengthBar" aria-hidden="true"></div>
+      <div class="strength-text" id="passwordStrengthText" aria-live="polite"></div>
+  
+      <button class="btn" type="submit" id="registerSubmit" disabled>Register</button>
+  
+      <div class="social-login" aria-label="Social login options for registration">
+        <button class="social-btn facebook" type="button" aria-label="Register with Facebook">Facebook</button>
+        <button class="social-btn google" type="button" id="googleRegisterBtn">Register with Google</button>
+      </div>
+    </form>
+  
+  </main>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="script.js"></script>
+</body>
+</html>

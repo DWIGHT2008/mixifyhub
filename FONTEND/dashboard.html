@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+</head>
+<body>
+ 
+<div id="sidebar">
+  <div class="-tabs">
+    <a href="profile.html">   <div class="avatar-frame">
+      <img id="userAvatar" class="avatar-img" alt="User Avatar">
+    </a> 
+   </div>
+   
+ <div id="avatarModal" style="display: none;">
+    <img id="largeAvatar" alt="Large Avatar View">
+  </div>
+  <h1 class="logo">   MixifyHub
+  </h1>
+    <h2 id="username">Loading...</h2>
+    <p id="email">Loading...</p>
+  </p>
+</div>
+
+<!-- Wrap your search box -->
+<div class="google-search-wrapper">
+  <script async src="https://cse.google.com/cse.js?cx=f2fd9ac43389f44aa"></script>
+  <div class="gcse-search"></div>
+</div>
+
+</div>
+    <div class="top-tabs">
+     
+      <div class="bar">
+      <a href="home.html">
+        Home
+      </a>
+      
+      <a  href="images.html">
+        Images
+      </a>
+      
+  
+          <a href="ads.html">
+            Discover  
+            </a>
+      <a href="news.html">
+         News  
+        </a>
+        <a href="marketplace.html">
+          marketplace  
+         </a>
+         <a href="MixifyHub AI.html">
+          MixifyHub AI
+         </a>
+      <a href="inbox.html">
+           Updates
+           </a>
+           
+           <a href="register.html">
+            Logout
+            </a>
+            
+         
+    </div>
+    </div>
+<!-- inner dashboard -->
+<!-- Title 1 -->
+
+<div class="widget-row">
+  <div class="widget"><div class="connected-accounts">
+    <!-- Sidebar Tabs -->
+    <div class="tab-icons">
+      <img src="./social plateforms/facebook.png" alt="Facebook" onclick="showTab('facebook')" id="facebookTab" />
+      <img src="./social plateforms/intergram.png" alt="Instagram" onclick="showTab('instagram')" id="instagramTab" />
+      <img src="./social plateforms/Twitter .png" alt="Twitter" onclick="showTab('twitter')" id="twitterTab" />
+    </div>
+    <div class="tab-icons">
+      <img src="./social plateforms/facebook.png" alt="Facebook" onclick="showTab('facebook')" id="facebookTab" />
+      <img src="./social plateforms/intergram.png" alt="Instagram" onclick="showTab('instagram')" id="instagramTab" />
+      <img src="./social plateforms/Twitter .png" alt="Twitter" onclick="showTab('twitter')" id="twitterTab" />
+    </div> <div class="tab-icons">
+      <img src="./social plateforms/facebook.png" alt="Facebook" onclick="showTab('facebook')" id="facebookTab" />
+      <img src="./social plateforms/intergram.png" alt="Instagram" onclick="showTab('instagram')" id="instagramTab" />
+      <img src="./social plateforms/Twitter .png" alt="Twitter" onclick="showTab('twitter')" id="twitterTab" />
+    </div> <div class="tab-icons">
+      <img src="./social plateforms/facebook.png" alt="Facebook" onclick="showTab('facebook')" id="facebookTab" />
+      <img src="./social plateforms/intergram.png" alt="Instagram" onclick="showTab('instagram')" id="instagramTab" />
+      <img src="./social plateforms/Twitter .png" alt="Twitter" onclick="showTab('twitter')" id="twitterTab" />
+    </div>
+  
+    <!-- Account Info Display -->
+    <div class="accounts-list">
+      <div class="account-box facebook" id="facebook">
+        <span class="platform"><img src="./social plateforms/facebook.png" alt="" /></span>
+        <span class="status" id="fbStatus">Not Connected</span>
+        <br>
+        <button onclick="connectAccount('facebook')">Connect</button>
+        <p><a href="https://www.facebook.com/">Visit Facebook</a></p>
+      </div>
+  
+      <div class="account-box instagram" id="instagram">
+        <span class="platform"><img src="./social plateforms/intergram.png" alt="" /></span>
+        <span class="status" id="igStatus">Not Connected</span>
+        <br>
+        <button onclick="connectAccount('instagram')">Connect</button>
+        <p><a href="https://www.instagram.com/">Visit Instagram</a></p>
+      </div>
+  
+      <div class="account-box twitter" id="twitter">
+        <span class="platform"><img src="./social plateforms/Twitter .png" alt="" /></span>
+        <span class="status" id="twStatus">Not Connected</span>
+        <br>
+        <button onclick="connectAccount('twitter')">Connect</button>
+        <p><a href="https://www.twitter.com/">Visit Twitter</a></p>
+      </div>
+    </div> 
+  </div>
+ </div>
+
+ <div class="widget">
+ 
+    <span class="typewriter-text" id="typewriter"></span>
+  
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="widget-row">
+        <div class="widget">
+          <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>News Loader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind for styling -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-4">
+
+  <!-- News Container -->
+  <h3>Trending stories</h3>
+  <div id="news-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <!-- News items inserted here -->
+  </div>
+
+  <script>
+    async function loadNews() {
+      try {
+        const source = 'newsapi'; // or 'gnews', 'guardian', etc.
+        const res = await fetch(`http://localhost:5000/api/news?source=${source}`);
+        const data = await res.json();
+        const newsContainer = document.getElementById('news-container');
+        newsContainer.innerHTML = '';
+
+        const newsItems = data.articles?.slice(0, 2) || [];
+
+        newsItems.forEach(news => {
+          const item = document.createElement('div');
+          item.className = "p-3 bg-gray-100 dark:bg-gray-800 rounded-lg hover:shadow transition";
+
+          item.innerHTML = `
+            ${news.urlToImage ? `
+              <a href="news.html"  rel="noopener">
+                <img src="${news.urlToImage}" alt="Image for ${news.title}" class="w-full h-40 object-cover rounded-md mb-3" />
+              </a>
+            ` : ''}
+            <a href="news.html" rel="noopener" class="text-blue-600 dark:text-blue-400 font-medium text-lg hover:underline">
+              ${news.title}
+            </a>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${news.source?.name || ''}</p>
+          `;
+
+          newsContainer.appendChild(item);
+        });
+      } catch (error) {
+        console.error('Failed to load news:', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadNews);
+  </script>
+
+</body>
+</html> <!-- news items inserted here -->
+           
+   
+    <!-- 🔁 Suggested Categories with Tabs -->
+    <div class="widget">
+  <div id="category-tabs" class="widget"></div>
+  <h3 id="suggested-title">Suggestions for you</h3>
+  <p id="suggested-message">Enjoy fresh picks or search more!</p>
+  <div id="suggested-images" class="widget-grid"></div>
+  <div class="view-more-container">
+    <a href="images.html" class="view-more-btn">View More →</a>
+  </div>
+</section>
+</div>    
+        
+
+
+
+   
+<!-- Floating Chat Icon -->
+<a href="MixifyHub AI.html">  <div class="chat-toggle" >💬</div></a>
+
+<!-- Chat Container -->
+<div class="chat-container" id="chatContainer" style="display: none;">
+  <div class="chat-header">Mixify AI Assistant</div>
+  <div class="chat-box" id="chatBox"></div>
+  <div class="chat-input">
+    <span id="voiceBtn" title="Voice Input 🎙️">🎙️</span>
+    <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" />
+    <span id="emojiBtn">😊</span>
+    <button id="sendBtn">Send</button>
+  </div>
+  <div id="emojiPicker" class="hidden"></div>
+    </div>
+  </div>
+<script src="dashboard.js"></script>
+</body>
+</html>

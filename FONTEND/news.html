@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MixifyHub / News</title>
+  <link rel="stylesheet" href="news.css" />
+</head>
+<body>
+  <header>
+    <h1>Mixify News Hub</h1>
+    <span class="back-button" onclick="history.back()">↩️</span> 
+    <!-- Menu Button -->
+    <button id="menu-toggle" title="Open Settings" aria-expanded="false" aria-controls="settings-sidebar">☰</button>
+
+    <!-- Settings Sidebar -->
+    <aside id="settings-sidebar" aria-hidden="true" aria-label="Settings Sidebar">
+      <h2>Settings</h2>
+
+      <section class="sidebar-section">
+        <h4>Layout</h4>
+        <label><input type="radio" name="layout" value="grid" checked /> Grid View</label><br />
+        <label><input type="radio" name="layout" value="list" /> List View</label>
+      </section>
+
+      <nav aria-label="Main Navigation">
+        <ul>
+          <li><a href="dashboard.html" title="Home"><img src="./support icons/home (2).png" alt="Home" /></a></li>
+          <li><a href="analytics.html" title="Analytics"><img src="./support icons/sales-report.png" alt="Analytics" /></a></li>
+          <li><a href="connectedaccounts.html" title="Connected Accounts"><img src="./support icons/internet.png" alt="Connected Accounts" /></a></li>
+          <li><a href="leaderboard.html" title="Leaderboard"><img src="./support icons/podium (1).png" alt="Leaderboard" /></a></li>
+          <li><a href="information.html" title="Updates"><img src="./support icons/mail.png" alt="Updates" /></a></li>
+          <li><a href="news.html" title="News"><img src="./support icons/global-news.png" alt="News" /></a></li>
+          <li><a href="profile.html" title="Settings"><img src="./support icons/setting.png" alt="Settings" /></a></li>
+          <li><a href="register.html" title="Log Out"><img src="./support icons/log-out (1).png" alt="Log Out" /></a></li>
+        </ul>
+
+        <div class="theme-toggle">
+          <label class="switch" for="themeToggle">
+            <input type="checkbox" id="themeToggle" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </nav>
+
+      <section class="sidebar-section">
+        <h4>Theme</h4>
+        <label><input type="radio" name="theme" value="light" checked /> Light</label><br />
+        <label><input type="radio" name="theme" value="dark" /> Dark</label>
+      </section>
+
+      <button id="close-sidebar" aria-label="Close Settings Sidebar">Close</button>
+    </aside>
+
+    <!-- News Search -->
+    <div class="news-search">
+      <input
+        type="text"
+        id="searchQuery"
+        placeholder="Search news..."
+        aria-label="Search news"
+      />
+      <button onclick="searchNews()" aria-label="Search news">Search</button>
+    </div>
+
+    <!-- News Filters -->
+    <div class="source-filter" role="group" aria-label="News Sources">
+      <button onclick="loadAllSources()">SEARCH RESULTS</button>
+      <button onclick="fetchNews('newsapi')">GENERAL NEWS</button>
+      <button onclick="fetchNews('currents')">CURRENTS</button>
+      <button onclick="fetchNews('gnews')">GLOBAL NEWS</button>
+      <button onclick="fetchNews('guardian')">GUARDIAN NEWS</button>
+      <button onclick="fetchNews('olds')">OLDS NEWS</button>
+      <button id="football-tab" aria-expanded="false" aria-controls="football-section">Football</button>
+
+      <section id="football-section" style="display:none;">
+        <nav aria-label="Football Navigation">
+          <button id="btn-teams">Teams</button>
+          <button id="btn-standings">Standings</button>
+          <button id="btn-matches">Matches</button>
+        </nav>
+        <div id="football-content" aria-live="polite"></div>
+      </section>
+    </div>
+  </header>
+
+  <main class="news-container" id="news" role="main" aria-live="polite"></main>
+
+  <script>
+    const backendUrl = 'http://localhost:5000';
+
+    // DOM Elements
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('settings-sidebar');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    const layoutRadios = document.querySelectorAll('input[name="layout"]');
+    const themeRadios = document.querySelectorAll('input[name="theme"]');
+    const newsContainer = document.getElementById('news');
+    const footballTab = document.getElementById('football-tab');
+    const footballSection = document.getElementById('football-section');
+    const footballContent = document.getElementById('football-content');
+
+    // Sidebar toggle handlers
+    menuToggle.addEventListener('click', () => {
+      const isOpen = sidebar.classList.toggle('open');
+      menuToggle.setAttribute('aria-expanded', isOpen);
+      sidebar.setAttribute('aria-hidden', !isOpen);
+    });
+    closeSidebarBtn.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', false);
+      sidebar.setAttribute('aria-hidden', true);
+    });
+
+    // Layout toggle: grid or list
+    layoutRadios.forEach(radio =>
+      radio.addEventListener('change', () => {
+        if (radio.value === 'list') {
+          newsContainer.style.display = 'block';
+          document.querySelectorAll('.news-card').forEach(card => {
+            card.style.width = '100%';
+            card.style.marginBottom = '1rem';
+          });
+        } else {
+          newsContainer.style.display = 'grid';
+          newsContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(320px, 1fr))';
+        }
+      })
+    );
+
+    // Theme toggle
+    themeRadios.forEach(radio =>
+      radio.addEventListener('change', () => {
+        document.body.classList.toggle('dark-mode', radio.value === 'dark');
+      })
+    );
+
+    // Show loading overlay with video
+    function showLoadingOverlay() {
+      newsContainer.innerHTML = `
+        <div id="loading-overlay" style="
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: black;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;">
+          <video
+            id="loading-video"
+            autoplay
+            loop
+            muted
+            playsinline
+            style="width: 90%; height: 90%; object-fit: cover;"
+          >
+            <source src="./support icons/news loading screen.mov" type="video/mp4" />
+          </video>
+        </div>`;
+    }
+
+    // Create a news card HTML
+    function createCard(article) {
+      return `
+        <article class="news-card">
+          ${article.image ? `<img src="${article.image}" alt="News Image" class="news-image" />` : ''}
+          <h3><a href="${article.url}" target="_blank" rel="noopener noreferrer">${article.title}</a></h3>
+          <p>${article.description || ''}</p>
+          <small>Source: ${article.source || ''}</small>
+        </article>
+      `;
+    }
+
+    // Fetch news from backend API by source
+    async function fetchNews(source) {
+      showLoadingOverlay();
+      await new Promise(res => setTimeout(res, 2000)); // Simulate loading delay
+
+      try {
+        console.log('Fetching news for source:', source);
+        const res = await fetch(`${backendUrl}/api/news?source=${source}`);
+        console.log('Response status:', res.status);
+
+        if (!res.ok) throw new Error('Network response not ok');
+
+        const data = await res.json();
+        console.log('Data:', data);
+
+        let articles = [];
+
+        switch (source) {
+          case 'newsapi':
+            articles = data.articles.map(a => ({
+              title: a.title,
+              url: a.url,
+              description: a.description,
+              source: 'NewsAPI',
+              image: a.urlToImage || null,
+            }));
+            break;
+
+          case 'currents':
+            articles = data.news.map(a => ({
+              title: a.title,
+              url: a.url,
+              description: a.description,
+              source: 'CurrentsAPI',
+              image: a.image || null,
+            }));
+            break;
+
+          case 'gnews':
+            articles = data.articles.map(a => ({
+              title: a.title,
+              url: a.url,
+              description: a.description,
+              source: 'GNews',
+              image: a.image || null,
+            }));
+            break;
+
+          case 'guardian':
+            articles = data.response.results.map(a => ({
+              title: a.webTitle,
+              url: a.webUrl,
+              description: a.fields?.trailText || '',
+              source: 'The Guardian',
+              image: a.fields?.thumbnail || null,
+            }));
+            break;
+
+          case 'olds':
+            articles = data.articles.map(a => ({
+              title: a.title,
+              url: a.url,
+              description: a.summary,
+              source: 'Olds',
+              image: a.image || null,
+            }));
+            break;
+
+          case 'football':
+            articles = data.news.map(a => ({
+              title: a.headline,
+              url: a.link,
+              description: a.summary,
+              source: 'Football API',
+              image: a.image || null,
+            }));
+            break;
+
+          default:
+            articles = [];
+        }
+
+        newsContainer.innerHTML = articles.length
+          ? articles.map(createCard).join('')
+          : '<p>No news found.</p>';
+
+        // Show news container and hide football section if needed
+        newsContainer.style.display = 'grid';
+        footballSection.style.display = 'none';
+        footballTab.setAttribute('aria-expanded', false);
+      } catch (err) {
+        console.error(err);
+        newsContainer.innerHTML = '<p>Failed to load news. Please try again later.</p>';
+      }
+    }
+
+    // Search news by query
+    async function searchNews() {
+      const query = document.getElementById('searchQuery').value.trim();
+      if (!query) return;
+
+      showLoadingOverlay();
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      try {
+        const res = await fetch(`${backendUrl}/api/news/search?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error('Network response not ok');
+
+        const data = await res.json();
+
+        const articles = data.articles.map(a => ({
+          title: a.title,
+          url: a.url,
+          description: a.description,
+          source: 'GNews',
+          image: a.image || null,
+        }));
+
+        newsContainer.innerHTML = articles.length
+          ? articles.map(createCard).join('')
+          : '<p>No results found.</p>';
+
+        newsContainer.style.display = 'grid';
+        footballSection.style.display = 'none';
+        footballTab.setAttribute('aria-expanded', false);
+      } catch (err) {
+        console.error(err);
+        newsContainer.innerHTML = '<p>Search failed. Please try again later.</p>';
+      }
+    }
+
+    // Load all sources combined (placeholder, implement as needed)
+    function loadAllSources() {
+      // You can implement this to fetch combined news from multiple sources
+      fetchNews('newsapi'); // default to newsapi or combine later
+    }
+
+    // Football section handlers
+    footballTab.addEventListener('click', () => {
+      newsContainer.style.display = 'none';
+      footballSection.style.display = 'block';
+      footballTab.setAttribute('aria-expanded', true);
+      document.getElementById('btn-teams').click(); // Load teams automatically
+    });
+
+    document.getElementById('btn-teams').addEventListener('click', async () => {
+      footballContent.innerHTML = 'Loading teams...';
+
+      try {
+        const res = await fetch(`${backendUrl}/api/football/teams`);
+        if (!res.ok) throw new Error('Failed to fetch football teams');
+        const data = await res.json();
+
+        footballContent.innerHTML = data.teams
+          .map(
+            team => `
+          <article class="team-card">
+            <h3>${team.name}</h3>
+            <p>Venue: ${team.venue}</p>
+            <p>Founded: ${team.founded}</p>
+            <img src="${team.crestUrl}" alt="${team.name} logo" width="100" />
+          </article>
+        `
+          )
+          .join('');
+      } catch (err) {
+        console.error(err);
+        footballContent.innerHTML = '<p>Error loading teams. Please try again.</p>';
+      }
+    });
+
+    document.getElementById('btn-standings').addEventListener('click', async () => {
+      footballContent.innerHTML = 'Loading standings...';
+
+      try {
+        const res = await fetch(`${backendUrl}/api/football/standings`);
+        if (!res.ok) throw new Error('Failed to fetch standings');
+        const data = await res.json();
+
+        const tableRows = data.standings[0].table
+          .map(
+            team => `
+          <tr>
+            <td>${team.position}</td>
+            <td>${team.team.name}</td>
+            <td>${team.playedGames}</td>
+            <td>${team.won}</td>
+            <td>${team.draw}</td>
+            <td>${team.lost}</td>
+            <td>${team.points}</td>
+          </tr>
+        `
+          )
+          .join('');
+
+        footballContent.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Pos</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>Pts</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        console.error(err);
+        footballContent.innerHTML = '<p>Error loading standings. Please try again.</p>';
+      }
+    });
+
+    document.getElementById('btn-matches').addEventListener('click', async () => {
+      footballContent.innerHTML = 'Loading matches...';
+
+      try {
+        const res = await fetch(`${backendUrl}/api/football/matches`);
+        if (!res.ok) throw new Error('Failed to fetch matches');
+        const data = await res.json();
+
+        footballContent.innerHTML = data.matches
+          .map(
+            match => `
+          <article class="match-card">
+            <p>${new Date(match.utcDate).toLocaleString()}</p>
+            <p>${match.homeTeam.name} vs ${match.awayTeam.name}</p>
+            <p>Status: ${match.status}</p>
+          </article>
+        `
+          )
+          .join('');
+      } catch (err) {
+        console.error(err);
+        footballContent.innerHTML = '<p>Error loading matches. Please try again.</p>';
+      }
+    });
+
+    // Initialize page with default news source
+    fetchNews('newsapi');
+  </script>
+</body>
+</html>

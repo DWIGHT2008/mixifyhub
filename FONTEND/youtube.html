@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YouTube Live Feeds</title>
+  <style>
+    :root {
+      font-family: sans-serif;
+    }
+
+    iframe {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+    }
+
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 10px;
+    }
+
+    .video-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #111;
+      border-radius: 12px;
+      overflow: hidden;
+      padding: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+
+    .fullscreen-btn {
+      margin-top: 8px;
+      padding: 8px 16px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      background-color: #ff0000;
+      color: white;
+      transition: background-color 0.3s ease;
+      width: 90%;
+      max-width: 300px;
+      cursor: pointer;
+    }
+
+    .fullscreen-btn:hover {
+      background-color: #cc0000;
+    }
+
+    .reel-wrapper {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+    }
+
+    .reel-item {
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    select, input, button {
+      margin: 5px;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    #channel-videos {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <span class="back-button" onclick="history.back()">↩️</span> 
+  <label for="theme-selector">Select Theme:</label>
+  <select id="theme-selector">
+    <option value="dark">🌑 Dark</option>
+    <option value="light">☀️ Light</option>
+    <option value="ocean">🌊 Ocean</option>
+    <option value="forest">🌲 Forest</option>
+    <option value="sunset">🌇 Sunset</option>
+  </select>
+
+  <h1>YouTube Feed</h1>
+
+  <label for="channelId">Enter YouTube Channel ID:</label>
+  <input type="text" id="channelId" placeholder="e.g., UC_x5XG1OV2P6uZZ5FSM9Ttw" />
+  <button onclick="fetchChannelVideos()">Load Videos</button>
+
+  <div id="channel-videos"></div>
+
+  <div class="category" id="videos">
+    <h2>live fetch Videos</h2>
+    <div class="videos-grid" id="video-list"></div>
+    <h2>🎥 Videos</h2>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/mX2GYzrolmo?si=fNsloQwwUUKCgF78" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/B7gtCoq2ndk?si=thLTd4xMo7kMJhFK" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/ZQliCRDaTvo?si=VAoczLkBl8ZLm5Fu" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/8wbtUTXfiSc?si=A-EjRVRFRjXTOZfJ" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/k1vWhii4tkE?si=MLJgSOO1nUYgFVBl" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/10Jd5kFshqM?si=iaGPgTefOUaJnXFZ" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/y8PFrYS86eo?si=YW4nbxB8Ar2Swv1h" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/8p6lVSDguDE?si=ZkXJbMARF486L9O9" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/P7I5uCMvRho?si=qimIfMS1CBfwn104" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/BowqD8gbWfc?si=539dm0GAoMVzUxlc" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/aCMGHNr8QM8?si=F3uyqgANlDDzI9ez" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/oclputlldN0?si=GpuamgGPYh4uVCV5" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/jN7B8ulTCyg?si=rca_iLk3og1PP1Rt" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/EVrhuGdek2w?si=F1u51H3DKfDtUItE" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/cXnKPG_ElRU?si=Qgz7NiRIm7L9Q1ob" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/TqR1iaQ-Sww?si=4aEqBHNLyP_wIf2S" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/oclputlldN0?si=GpuamgGPYh4uVCV5" allowfullscreen></iframe>
+    <h1>comedy
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+   <iframe class="youtube-frame" src="https://www.youtube.com/embed/AuU2fC53TgA?si=QeryrRCSSyt-ghkE" allowfullscreen></iframe>
+ 
+   
+   
+   
+   
+   
+   
+
+
+
+
+
+
+
+  </div>
+
+
+
+  <div class="category" id="shorts">
+    <h2>📱 Reels / Shorts</h2>
+    <div class="reel-wrapper" id="shorts-list"></div>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/i_ccYpd__e0?si=ytFLta_0CTBO1a5l" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/uH2ob3szCuM?si=NXktFxEnLHN04OhH" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/ANEokonLIPg?si=o2X_8JfHuLLnK231" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/fXxUYb0s-pc?si=Sooaf6UTZw75Q68s" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/5dhUMnlC59E?si=KclXxJey3aS3cir-" allowfullscreen></iframe>
+    <iframe class="youtube-frame" src="https://www.youtube.com/embed/10Jd5kFshqM?si=uCbSg_97wNfjjVjs" allowfullscreen></iframe>
+    
+  </div>
+
+  <script>
+    function changeTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.getElementById('theme-selector').value = savedTheme;
+    document.getElementById('theme-selector').addEventListener('change', function () {
+      changeTheme(this.value);
+    });
+
+    const API_URL = 'http://localhost:5000/api/videos';
+
+    function createVideoIframe(videoId) {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}`;
+      iframe.allowFullscreen = true;
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      return iframe;
+    }
+
+    function addFullscreenButton(iframe) {
+      const btn = document.createElement('button');
+      btn.innerText = 'Fullscreen';
+      btn.className = 'fullscreen-btn';
+      btn.onclick = () => {
+        if (iframe.requestFullscreen) iframe.requestFullscreen();
+        else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+        else if (iframe.mozRequestFullScreen) iframe.mozRequestFullScreen();
+        else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+      };
+      return btn;
+    }
+
+    // Load standard videos
+    fetch(`${API_URL}?type=videos&q=tech`)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('video-list');
+        data.items.forEach(item => {
+          const videoId = item.id.videoId;
+          const iframe = createVideoIframe(videoId);
+          const btn = addFullscreenButton(iframe);
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'video-wrapper';
+          wrapper.appendChild(iframe);
+          wrapper.appendChild(btn);
+
+          container.appendChild(wrapper);
+        });
+      });
+
+    // Load shorts (reels with vertical scroll)
+    fetch(`${API_URL}?type=shorts`)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('shorts-list');
+        data.items.forEach(item => {
+          const videoId = item.id.videoId;
+          const iframe = createVideoIframe(videoId);
+          iframe.style.height = '80vh';
+          iframe.style.width = '90%';
+
+          const btn = addFullscreenButton(iframe);
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'reel-item';
+          wrapper.appendChild(iframe);
+          wrapper.appendChild(btn);
+
+          container.appendChild(wrapper);
+        });
+      });
+
+    // Load videos by channel
+    function fetchChannelVideos() {
+      const channelId = document.getElementById('channelId').value.trim();
+      const videoContainer = document.getElementById('channel-videos');
+      videoContainer.innerHTML = '';
+
+      if (!channelId) {
+        alert('Please enter a valid Channel ID.');
+        return;
+      }
+
+      fetch(`${API_URL}?type=channel&channelId=${channelId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.items || data.items.length === 0) {
+            videoContainer.innerHTML = '<p>No videos found for this channel.</p>';
+            return;
+          }
+
+          data.items.forEach(item => {
+            const videoId = item.id.videoId;
+            const iframe = createVideoIframe(videoId);
+            const btn = addFullscreenButton(iframe);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'video-wrapper';
+            wrapper.appendChild(iframe);
+            wrapper.appendChild(btn);
+
+            videoContainer.appendChild(wrapper);
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          videoContainer.innerHTML = '<p>Error fetching videos. Check the channel ID.</p>';
+        });
+    }
+  </script>
+</body>
+</html>

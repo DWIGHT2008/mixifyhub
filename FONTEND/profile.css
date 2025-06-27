@@ -1,0 +1,222 @@
+/* General Body Styling */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #764ba2, #667eea);
+    margin: 0;
+    padding: 0;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+  
+  /* Profile Card */
+  #profile {
+    background: white;
+    max-width: 700px;
+    width: 90%;
+    margin: 80px auto;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    z-index: 1;
+    position: relative;
+  }
+  
+  /* Profile Avatar */
+  #currentAvatarImg {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 4px solid #764ba2;
+    margin-bottom: 10px;
+    box-shadow: 0 0 10px rgba(118, 75, 162, 0.5);
+  }
+  
+  /* Buttons */
+  button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    font-weight: 600;
+    font-size: 15px;
+    color: white;
+    background: linear-gradient(to right, #764ba2, #667eea);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  
+  /* Inputs */
+  input[type="password"] {
+    width: 80%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin: 8px 0;
+  }
+  
+  /* Sidebar Navigation */
+  #sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 220px;
+    height: 100vh;
+    background: #2c2352;
+    color: white;
+    padding-top: 60px;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.25);
+    z-index: 2;
+  }
+  
+  #sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  #sidebar ul li {
+    margin: 20px 0;
+    text-align: center;
+  }
+  
+  #sidebar ul li a,
+  #sidebar ul li button {
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 10px 20px;
+    display: block;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.3s;
+    background: transparent;
+  }
+  
+  #sidebar ul li a:hover,
+  #sidebar ul li button:hover {
+    background-color: #51427d;
+  }
+  
+  /* Modal Styling */
+  .modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal.hidden {
+    display: none;
+  }
+  
+  .modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  
+  /* Close Button */
+  #closeModalBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #aaa;
+  }
+  
+  #closeModalBtn:hover {
+    color: #333;
+  }
+  
+  /* Avatar Options */
+  .avatar-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  
+  .avatar-options img {
+    width: 60px;
+    height: 60px;
+    margin: 8px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.3s;
+  }
+  
+  .avatar-options img:hover {
+    transform: scale(1.1);
+  }
+  
+  .avatar-options img.selected {
+    border-color: #764ba2;
+  }
+  
+  /* Color Picker */
+  #avatarColor {
+    margin-top: 10px;
+    height: 35px;
+    width: 50%;
+    border: none;
+    outline: none;
+  }
+  
+  /* Password Status Message */
+  #passwordStatus,
+  #avatarStatus {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  
+  /* Responsive Layout */
+  @media screen and (max-width: 768px) {
+    #sidebar {
+      width: 180px;
+    }
+  
+    #profile {
+      margin-left: 190px;
+      margin-right: 10px;
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    #sidebar {
+      display: none;
+    }
+  
+    #profile {
+      margin: 20px;
+      width: 95%;
+    }
+  
+    input[type="password"] {
+      width: 100%;
+    }
+  
+    .modal-content {
+      width: 95%;
+    }
+  }

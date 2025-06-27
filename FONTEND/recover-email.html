@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recover Email</title>
+  <link rel="stylesheet" href="styles-recover.css" />
+</head>
+<body>
+
+  <main class="container">
+    <div class="info-box">
+      <h2>Important Information</h2>
+      <p>
+        Hi there, we would like to first inform you that our recover email page only recovers your email 
+        if it was the one recently used.
+      </p>
+      <a href="help.html#tips">Learn more</a>
+    </div>
+    <h2>Recover Your Email</h2>
+    <form id="recoverForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required />
+
+      <label for="password">Password</label>
+<div style="position: relative;">
+  <input type="password" id="password" name="password" required />
+  <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+    👁️
+  </button>
+</div>
+      <label for="emailHint">What do you remember about your email?</label>
+      <input type="text" id="emailHint" name="emailHint" required />
+
+      <button type="submit">Recover</button>
+      <a class="back-link" href="register.html">Back to login page</a>
+    </form>
+    <p id="message"></p>
+  </main>
+
+  <script>
+    document.getElementById('recoverForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+    
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const emailHint = document.getElementById('emailHint').value.trim();
+    
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/recover-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, emailHint })
+        });
+    
+        const data = await response.json();
+    
+        console.log('Response status:', response.status);
+        console.log('Response data:', data);
+    
+        if (response.ok) {
+          // Successful recovery: redirect to dashboard
+          window.location.href = 'dashboard.html';
+        } else {
+          // Show backend error message on the page
+          const msgElem = document.getElementById('message');
+          msgElem.textContent = data.message || 'Recovery failed. Please check your inputs.';
+          msgElem.style.color = 'red';
+          // Optional: Do NOT redirect immediately, let user fix inputs
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        const msgElem = document.getElementById('message');
+        msgElem.textContent = 'Network or server error. Please try again later.';
+        msgElem.style.color = 'red';
+      }
+    });
+    
+    // Password toggle logic remains unchanged
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Your Profile</title>
+ <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+  <div id="profile">
+    
+    <img id="currentAvatarImg" src="avatars/default.svg" alt="Current Avatar" style="width:80px; height:80px; border-radius:50%; border: 3px solid #764ba2; margin: 10px auto; display: block;" />
+    
+    <p><strong>Username:</strong> <span id="username">Loading...</span></p>
+    <p><strong>Email:</strong> <span id="email">Loading...</span></p>
+    <p><strong>Joined:</strong> <span id="joined">Loading...</span></p>
+     <button id="openAvatarModalBtn">Change Avatar</button>
+   <hr>
+
+
+    <h3>Change Password</h3>
+    <form id="changePasswordForm">
+      <input type="password" id="currentPassword" placeholder="Current Password" required><br><br>
+      <input type="password" id="newPassword" placeholder="New Password" required><br><br>
+      <button type="submit">Change Password</button>
+    </form>
+    <p id="passwordStatus"></p>
+    <div id="sidebar">
+      <span class="back-button" onclick="history.back()">↩️</span> 
+      <ul>
+        <li><a href="dashboard.html">Home</a></li>
+        <li><a href="profile.html">Settings</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="connectedaccounts.html">Connected accounts</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+        <li><a href="marketplace.html">Market place</a></li>
+        <li><button id="logout">Logout</button></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Avatar Modal -->
+  <div id="avatarModal" class="modal hidden">
+    <div class="modal-content">
+      <button id="closeModalBtn">&times;</button>
+      <h3>Choose Avatar</h3>
+      <div class="avatar-options">
+        <img src="avatars/avatar1.svg" data-avatar="avatar1" alt="Avatar 1" />
+        <img src="avatars/avatar2.svg" data-avatar="avatar2" alt="Avatar 2" />
+        <img src="avatars/avatar3.svg" data-avatar="avatar3" alt="Avatar 3" />
+        <img src="avatars/avatar4.svg" data-avatar="avatar4" alt="Avatar 4" />
+      </div>
+      <label for="avatarColor">Pick Color:</label><br>
+      <input type="color" id="avatarColor" value="#764ba2" style="margin: 10px 0;" />
+      <br>
+      <button id="saveAvatarBtn">Save</button>
+      <p id="avatarStatus" style="margin-top: 10px;"></p>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Not logged in');
+      window.location.href = 'index.html';
+    }
+
+    // Modal Elements
+    const avatarModal = document.getElementById('avatarModal');
+    const openModalBtn = document.getElementById('openAvatarModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const avatarImages = document.querySelectorAll('.avatar-options img');
+    const avatarColorPicker = document.getElementById('avatarColor');
+    const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+    const avatarStatus = document.getElementById('avatarStatus');
+    const currentAvatarImg = document.getElementById('currentAvatarImg');
+
+    let selectedAvatar = null;
+
+    // Load user profile info
+    fetch('http://localhost:5000/api/auth/me', {
+      headers: { Authorization: 'Bearer ' + token }
+    })
+    .then(res => res.json())
+    .then(user => {
+      if (user.message) {
+        alert(user.message);
+        window.location.href = 'index.html';
+      } else {
+        document.getElementById('username').textContent = user.username;
+        document.getElementById('email').textContent = user.email;
+        const joinedDate = new Date(user.createdAt).toLocaleDateString();
+        document.getElementById('joined').textContent = joinedDate;
+
+        // Show current avatar and color
+        if (user.avatar && user.avatar.name) {
+          const avatarName = user.avatar.name;
+          const avatarColor = user.avatar.color || '#764ba2';
+
+          currentAvatarImg.src = `avatars/${avatarName}.svg`;
+          currentAvatarImg.style.borderColor = avatarColor;
+
+          // Set modal color picker to current color
+          avatarColorPicker.value = avatarColor;
+
+          // Pre-select current avatar in modal
+          avatarImages.forEach(img => {
+            if (img.getAttribute('data-avatar') === avatarName) {
+              img.classList.add('selected');
+              selectedAvatar = avatarName;
+            } else {
+              img.classList.remove('selected');
+            }
+          });
+        }
+      }
+    })
+    .catch(err => {
+      alert('Failed to load profile');
+      console.error(err);
+      window.location.href = 'index.html';
+    });
+
+    // Open modal
+    openModalBtn.addEventListener('click', () => {
+      avatarStatus.textContent = '';
+      avatarModal.classList.remove('hidden');
+    });
+
+    // Close modal
+    closeModalBtn.addEventListener('click', () => {
+      avatarModal.classList.add('hidden');
+      clearSelection();
+    });
+
+    // Click outside modal closes it
+    window.addEventListener('click', (e) => {
+      if (e.target === avatarModal) {
+        avatarModal.classList.add('hidden');
+        clearSelection();
+      }
+    });
+
+    // Avatar selection
+    avatarImages.forEach(img => {
+      img.addEventListener('click', () => {
+        clearSelection();
+        img.classList.add('selected');
+        selectedAvatar = img.getAttribute('data-avatar');
+      });
+    });
+
+    function clearSelection() {
+      avatarImages.forEach(img => img.classList.remove('selected'));
+      selectedAvatar = null;
+      avatarStatus.textContent = '';
+    }
+
+    // Save avatar selection + color to backend
+    saveAvatarBtn.addEventListener('click', async () => {
+      if (!selectedAvatar) {
+        avatarStatus.textContent = '❌ Please select an avatar.';
+        return;
+      }
+
+      const color = avatarColorPicker.value;
+
+      try {
+        const res = await fetch('http://localhost:5000/api/auth/update-avatar', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token
+          },
+          body: JSON.stringify({ avatar: selectedAvatar, color: color }) // corrected
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          avatarStatus.textContent = '✅ Avatar updated successfully!';
+
+          // Update current avatar on profile instantly
+          currentAvatarImg.src = `avatars/${selectedAvatar}.svg`;
+          currentAvatarImg.style.borderColor = color;
+
+          setTimeout(() => {
+            avatarModal.classList.add('hidden');
+            clearSelection();
+          }, 1500);
+        } else {
+          avatarStatus.textContent = '❌ ' + (data.message || 'Failed to update avatar.');
+        }
+      } catch (err) {
+        avatarStatus.textContent = '❌ Error updating avatar.';
+        console.error(err);
+      }
+    });
+
+    // Logout
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    });
+
+    // Password change form
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+
+      try {
+        const res = await fetch('http://localhost:5000/api/auth/change-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token
+          },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+
+        const data = await res.json();
+        document.getElementById('passwordStatus').textContent = res.ok ? '✅ ' + data.message : '❌ ' + data.message;
+      } catch (err) {
+        document.getElementById('passwordStatus').textContent = '❌ Error changing password';
+      }
+    });  
+  </script>
+</body>
+</html>

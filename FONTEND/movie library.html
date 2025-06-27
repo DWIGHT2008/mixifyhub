@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trending Movies - TMDB</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .movie-card {
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .movie-card img {
+      width: 100%;
+      border-radius: 5px;
+    }
+    .movie-title {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎬 Trending Movies</h1>
+  <div class="movie-grid" id="movieGrid"></div>
+
+  <script>
+    const apiKey = 'http://www.omdbapi.com/?i=tt3896198&apikey=575bba2f'; // ← Replace this with your actual TMDB API Key
+    const apiUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}`;
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        const movieGrid = document.getElementById('movieGrid');
+        data.results.forEach(movie => {
+          const poster = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+          const card = document.createElement('div');
+          card.className = 'movie-card';
+          card.innerHTML = `
+            <img src="${poster}" alt="${movie.title}">
+            <div class="movie-title">${movie.title}</div>
+          `;
+          movieGrid.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error('Failed to fetch movies:', err);
+        document.getElementById('movieGrid').innerHTML = `<p>Error loading movies.</p>`;
+      });
+  </script>
+
+</body>
+</html>

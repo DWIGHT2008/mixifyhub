@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Platform Loading</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background-color: #571a3b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .loader-container {
+      text-align: center;
+      opacity: 0;
+      position: absolute;
+      transition: opacity 1s ease;
+    }
+
+    .active {
+      opacity: 1;
+      position: relative;
+    }
+
+    .logo {
+      width: 100px;
+      height: auto;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .typewriter {
+      font-size: 1.1rem;
+      overflow: hidden;
+      border-right: 2px solid white;
+      white-space: nowrap;
+      margin: 0 auto;
+      width: 0;
+      animation: typing 3s steps(40, end) forwards, blink 1s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      0%, 100% { border-color: transparent; }
+      50% { border-color: white; }
+    }
+
+    .glow-loader {
+      width: 200px;
+      height: 6px;
+      background: #ffffff30;
+      margin: 20px auto;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .glow-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(to right, #ff0000, #ffffff);
+      animation: fill 3s ease-in-out infinite;
+    }
+
+    @keyframes fill {
+      0% { width: 0; }
+      50% { width: 100%; }
+      100% { width: 0; }
+    }
+
+    .skip-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: #fff;
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-container active" id="youtube">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube" class="logo" />
+    <div class="typewriter">Launching YouTube Entertainment Engine into MixifyHub..</div>
+    <div class="glow-loader"><div class="glow-fill"></div></div>
+  </div>
+
+  <div class="loader-container" id="x">
+    <img src="./social plateforms/Twitter .png" alt="X" class="logo" />
+    <div class="typewriter">Opening X (Twitter) Feed Universe into MixifyHub..</div>
+    <div class="glow-loader"><div class="glow-fill"></div></div>
+  </div>
+
+  <div class="loader-container" id="linkedin">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" class="logo" />
+    <div class="typewriter">Connecting Professionals on LinkedIn into MixifyHub...</div>
+    <div class="glow-loader"><div class="glow-fill"></div></div>
+  </div>
+
+  <div class="loader-container" id="whatsapp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="logo" />
+    <div class="typewriter">Syncing Chats on WhatsApp into MixifyHub...</div>
+    <div class="glow-loader"><div class="glow-fill"></div></div>
+  </div>
+
+  <div class="loader-container" id="facebook">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="logo" />
+    <div class="typewriter">Connecting  Facebook Social Grid into MixifyHub...</div>
+    <div class="glow-loader"><div class="glow-fill"></div></div>
+  </div>
+
+  <div class="loader-container" id="instagram">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="logo" />
+    <div class="typewriter">Tuning into Instagram Moments in MixifyHub...</div>
+    <div class="glow-loader"><div class="glow-fill"></div></div>
+  </div>
+  
+  <button class="skip-btn" onclick="window.location.href='register.html'">Skip</button>
+
+  <script>
+    const loaders = ["youtube", "x", "linkedin", "whatsapp", "facebook", "instagram"];
+  let index = 0;
+
+  function showLoader(i) {
+    if (i > 0) {
+      document.getElementById(loaders[i - 1]).classList.remove("active");
+    }
+    if (i < loaders.length) {
+      document.getElementById(loaders[i]).classList.add("active");
+      setTimeout(() => showLoader(i + 1), 4500);
+    } else {
+      window.location.href = "register.html";
+    }
+  }
+
+  // Start the sequence
+  showLoader(0);
+  </script>
+</body>
+</html>
