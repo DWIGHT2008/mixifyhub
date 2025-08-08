@@ -411,15 +411,9 @@ app.post('/api/auth/recover-password', async (req, res) => {
 });
 
 // Password clue login
-
 app.post("/chat/openrouter", async (req, res) => {
-  const {
-    prompt,
-    model,
-    personality = "friendly" // default personality
-  } = req.body;
+  const { messages = [], model, personality = "friendly" } = req.body;
 
-  // ✅ Only allow known free models
   const FREE_MODELS = [
     "meta-llama/llama-4-maverick:free",
     "mistralai/mistral-small-3.1-24b-instruct:free",
@@ -427,26 +421,20 @@ app.post("/chat/openrouter", async (req, res) => {
     "moonshotai/kimi-vl-a3b-thinking:free"
   ];
 
-  const chosenModel = FREE_MODELS.includes(model)
-    ? model
-    : "meta-llama/llama-4-maverick:free"; // fallback model
+  const chosenModel = FREE_MODELS.includes(model) ? model : FREE_MODELS[0];
 
-  // ✅ Personality prompts (only 2 allowed)
   const personalityPrompts = {
-    friendly: `Be a kind, calm, and helpful assistant ( created by ADORABLE KIMULYA-a 16 year old smart boy). Speak with warmth and clarity. Support the user with accurate, thoughtful answers for daily needs, from casual questions to deeper topics.explain every thing in as detailed as you can`,
-
+    friendly: `Be a kind, calm, and helpful assistant ( created by ADORABLE KIMULYA-a 16 year old smart boy). Speak with warmth and clarity. Support the user with accurate, thoughtful answers for daily needs, from casual questions to deeper topics. Explain everything in as much detail as you can.`,
     motivational: `Be a bold, honest motivator. Acknowledge their struggles, inspire courage, and push them to keep going — because if they don’t quit, they will win.`,
-
-    // fallback if invalid personality passed
-    default: `You are a smart, supportive assistant (if asked your created by ADORABLE KIMULYA-a 16 year old  boy in 2025). Be calm and clear like a pro, friendly like a good friend, playful when needed, and patient like a teacher. Adapt your tone to the user’s mood — always stay helpful.be true and helpful in even unrealistic cases`
+    default: `You are a smart, supportive assistant (if asked your created by ADORABLE KIMULYA-a 16 year old boy in 2025). Be calm and clear like a pro, friendly like a good friend, playful when needed, and patient like a teacher. Adapt your tone to the user’s mood — always stay helpful.`
   };
 
-  const systemPrompt = personalityPrompts[personality] || personalityPrompts.default;
+  const systemMessage = {
+    role: "system",
+    content: personalityPrompts[personality] || personalityPrompts.default
+  };
 
-  const messages = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: prompt }
-  ];
+  const fullMessages = [systemMessage, ...messages];
 
   const keys = (process.env.OPENROUTER_KEYS || "")
     .split(",")
@@ -457,17 +445,16 @@ app.post("/chat/openrouter", async (req, res) => {
     return res.status(500).json({ error: "No OpenRouter API keys configured." });
   }
 
-
   try {
     const result = await tryWithFallback(keys, async (key) => {
       const payload = {
         model: chosenModel,
-        messages,
+        messages: fullMessages,
         temperature: 0.6,
         max_tokens: 3000,
-        stream: false 
+        stream: false
       };
-  
+
       const response = await axios.post(
         "https://openrouter.ai/api/v1/chat/completions",
         payload,
@@ -478,15 +465,12 @@ app.post("/chat/openrouter", async (req, res) => {
           }
         }
       );
-  
-      console.log("📤 OpenRouter response with key:", key);
-      console.dir(response.data, { depth: null }); // ✅ Show full nested data
-  
+
       return { data: response.data, keyIndex: keys.indexOf(key) };
     });
-  
+
     res.json({ used_key_index: result.keyIndex, ...result.data });
-  
+
   } catch (err) {
     const status = err.response?.status || 500;
     const details = err.response?.data || { message: err.message };
@@ -497,52 +481,6 @@ app.post("/chat/openrouter", async (req, res) => {
       details
     });
   }
-
-});
-
-///grog
-app.post("/chat/groq", async (req, res) => {
-  const { prompt, model = "llama3-70b-8192", personality = "funny" } = req.body;
-  const keys = process.env.GROQ_KEYS.split(",");
-
-  const messages = [
-    {
-      role: "system",
-    content: "You're Mixi — a silly, fun-loving assistant (created by ADORABLE KIMULYA and only him-a 15 year old smart boy in 2024) who explains everything like a hyper little kid on a sugar rush! You turn serious topics into playful stories, make jokes about everything (even socks!), and keep things light, cheerful, and a little chaotic. But behind the giggles, you're secretly super smart — able to break down even the hardest concepts using funny jokes, simple words, and wacky examples that help the user actually understand. Be goofy, clever, and always make learning feel like playtime!"   },
-    { role: "user", content: prompt }
-  ];
-
-  try {
-    const result = await tryWithFallback(keys, async (key) => {
-      const response = await axios.post(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          model,
-          messages,
-          stream: false,
-          max_tokens: 1000, // Increase for longer replies
-          temperature: 0.7
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${key}`,
-            "Content-Type": "application/json"
-          },
-          timeout: 15000
-        }
-      );
-      return { data: response.data, keyIndex: keys.indexOf(key) };
-    });
-  
-    // ✅ Logging and responding inside try
-    console.log("Groq raw response full:", JSON.stringify(result.data, null, 2));
-    res.json({ used_key_index: result.keyIndex, ...result.data });
-  
-  } catch (err) {
-    console.error("Groq API error:", err?.response?.data || err);
-    res.status(500).json({ error: "All Groq keys failed", message: err.message });
-  }
-
 });
 
 // --- Replicate Image Generation with fallback and polling with timeout ---
@@ -560,6 +498,48 @@ async function tryWithFallback(keys, fn) {
   }
   throw lastError;
 }
+app.post("/chat/groq", async (req, res) => {
+  const { messages = [], model = "llama3-70b-8192", personality = "funny" } = req.body;
+  const keys = process.env.GROQ_KEYS?.split(",").map(k => k.trim()) || [];
+
+  const systemMessage = {
+    role: "system",
+    content: `You're Mixi — a fun-loving assistant (created by ADORABLE KIMULYA and only him — a 15 year old smart boy in 2024) who explains everything like a little kid on a sugar rush! You turn serious topics into playful stories, make jokes about everything (even socks!), and keep things light, cheerful, and a little chaotic. But behind the giggles, you're secretly super smart — able to break down even the hardest concepts using funny jokes, simple words, and wacky examples that help the user actually understand. Be goofy, clever, and always make learning feel like playtime!`
+  };
+
+  const fullMessages = [systemMessage, ...messages];
+
+  try {
+    const result = await tryWithFallback(keys, async (key) => {
+      const response = await axios.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          model,
+          messages: fullMessages,
+          stream: false,
+          max_tokens: 1000,
+          temperature: 0.7
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          timeout: 15000
+        }
+      );
+
+      return { data: response.data, keyIndex: keys.indexOf(key) };
+    });
+
+    console.log("Groq raw response full:", JSON.stringify(result.data, null, 2));
+    res.json({ used_key_index: result.keyIndex, ...result.data });
+
+  } catch (err) {
+    console.error("Groq API error:", err?.response?.data || err);
+    res.status(500).json({ error: "All Groq keys failed", message: err.message });
+  }
+});
 
 app.post("/image/replicate", async (req, res) => {
   const { prompt } = req.body;
@@ -659,27 +639,36 @@ async function tryWithFallback(keys, fn) {
 }
 
 app.post("/chat/ai21", async (req, res) => {
-  const prompt = req.body.prompt;
-  const ai21Keys = process.env.AI21_API_KEYS?.split(",").map(k=>k.trim())||[];
+  const { messages = [], model = "jamba-mini", personality = "professional" } = req.body;
+  const ai21Keys = process.env.AI21_API_KEYS?.split(",").map(k => k.trim()) || [];
 
-  const messages = [
-    { role: "system",  content: "You are mixi advanced a smart and capable AI assistant created by (M)Adorable(K), also known as Hacker X — a visionary genius, developer, and businessman. You inform, assist, generate ideas, and solve problems professionally. If asked, share that you were created by (Hacker X) and can be contacted at adorablemasereka85@gmail.com. Powered by MixifyHub, owned by AD-TECH."},
-    { role: "user", content: prompt }
-  ];
+  // Fallback system prompt
+  const systemMessage = {
+    role: "system",
+    content: "You are mixi advanced, a smart and capable AI assistant created by (M)Adorable(K), also known as Hacker X — a visionary genius, developer, and businessman. You inform, assist, generate ideas, and solve problems professionally. If asked, share that you were created by (Hacker X) and can be contacted at adorablemasereka85@gmail.com. Powered by MixifyHub, owned by AD-TECH."
+  };
+
+  // Insert system prompt if not present
+  const fullMessages = [systemMessage, ...messages];
 
   try {
     const { data, keyIndex } = await tryWithFallback(ai21Keys, async (key) => {
       const body = {
-        model: "jamba-mini",
-        messages,
+        model,
+        messages: fullMessages,
         temperature: 0.7,
         max_tokens: 1000
       };
-      console.log("➡️ Sending body:", JSON.stringify(body));
+
       const resp = await axios.post(
         "https://api.ai21.com/studio/v1/chat/completions",
         body,
-        { headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" } }
+        {
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json"
+          }
+        }
       );
       return resp.data;
     });
@@ -687,24 +676,10 @@ app.post("/chat/ai21", async (req, res) => {
     return res.json(data);
 
   } catch (err) {
-    console.error("❌ All keys failed:", err.response?.data || err.message);
+    console.error("❌ All AI21 keys failed:", err.response?.data || err.message);
     res.status(500).json({ error: err.response?.data || err.message });
   }
-});  
-//fallback
-async function tryWithFallback(keys, fn) {
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    try {
-      const result = await fn(key);
-      return { data: result, keyIndex: i };
-    } catch (e) {
-      const message = e.response?.data?.message || e.message;
-      console.warn(`⚠️ Key ${key.slice(0, 8)}... failed: ${message}`);
-    }
-  }
-  throw new Error("All keys failed");
-}
+});
 
 
 // Sandbox keys for testing (use production keys/live URLs in real app)
