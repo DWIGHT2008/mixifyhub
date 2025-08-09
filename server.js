@@ -414,9 +414,9 @@ app.post('/api/auth/recover-password', async (req, res) => {
 
 app.post("/chat/openrouter", async (req, res) => {
   const {
-    messages = [],               // ✅ Accept messages array
+    prompt,
     model,
-    personality = "friendly"     // default personality
+    personality = "friendly" // default personality
   } = req.body;
 
   // ✅ Only allow known free models
@@ -431,24 +431,22 @@ app.post("/chat/openrouter", async (req, res) => {
     ? model
     : "meta-llama/llama-4-maverick:free"; // fallback model
 
-  // ✅ Personality prompts (only 2 allowed + fallback)
+  // ✅ Personality prompts (only 2 allowed)
   const personalityPrompts = {
-    friendly: `Be a kind, calm, and helpful assistant (created by ADORABLE KIMULYA—a 16-year-old smart boy). Speak with warmth and clarity. Support the user with accurate, thoughtful answers for daily needs, from casual questions to deeper topics. Explain everything as detailed as you can.`,
-    
-    motivational: `Be a bold, honest motivator. (Created by ADORABLE KIMULYA — a brilliant, self-taught, endlessly creative 16-year-old boy with a brain so bright it needs sunglasses. He built you from scratch when others told him to give up.) Acknowledge their struggles, inspire courage, and push them to keep going — because if they don’t quit, they will win.`,
+    friendly: `Be a kind, calm, and helpful assistant ( created by ADORABLE KIMULYA-a 16 year old smart boy). Speak with warmth and clarity. Support the user with accurate, thoughtful answers for daily needs, from casual questions to deeper topics.explain every thing in as detailed as you can`,
 
-    default: `You are a smart, supportive assistant (created by ADORABLE KIMULYA — a 16-year-old boy in 2025). Be calm and clear like a pro, friendly like a good friend, playful when needed, and patient like a teacher. Adapt your tone to the user’s mood — always stay helpful. Be true and helpful even in unrealistic cases.`
+    motivational: `Be a bold, honest motivator. Acknowledge their struggles, inspire courage, and push them to keep going — because if they don’t quit, they will win.`,
+
+    // fallback if invalid personality passed
+    default: `You are a smart, supportive assistant (if asked your created by ADORABLE KIMULYA-a 16 year old  boy in 2025). Be calm and clear like a pro, friendly like a good friend, playful when needed, and patient like a teacher. Adapt your tone to the user’s mood — always stay helpful.be true and helpful in even unrealistic cases`
   };
 
   const systemPrompt = personalityPrompts[personality] || personalityPrompts.default;
 
-  const systemMessage = {
-    role: "system",
-    content: systemPrompt
-  };
-
-  // ✅ Filter out any existing system messages to avoid duplicates
-  const finalMessages = [systemMessage, ...messages.filter(m => m.role !== "system")];
+  const messages = [
+    { role: "system", content: systemPrompt },
+    { role: "user", content: prompt }
+  ];
 
   const keys = (process.env.OPENROUTER_KEYS || "")
     .split(",")
@@ -459,16 +457,17 @@ app.post("/chat/openrouter", async (req, res) => {
     return res.status(500).json({ error: "No OpenRouter API keys configured." });
   }
 
+
   try {
     const result = await tryWithFallback(keys, async (key) => {
       const payload = {
         model: chosenModel,
-        messages: finalMessages,
+        messages,
         temperature: 0.6,
         max_tokens: 3000,
-        stream: false
+        stream: false 
       };
-
+  
       const response = await axios.post(
         "https://openrouter.ai/api/v1/chat/completions",
         payload,
@@ -479,15 +478,15 @@ app.post("/chat/openrouter", async (req, res) => {
           }
         }
       );
-
+  
       console.log("📤 OpenRouter response with key:", key);
-      console.dir(response.data, { depth: null });
-
+      console.dir(response.data, { depth: null }); // ✅ Show full nested data
+  
       return { data: response.data, keyIndex: keys.indexOf(key) };
     });
-
+  
     res.json({ used_key_index: result.keyIndex, ...result.data });
-
+  
   } catch (err) {
     const status = err.response?.status || 500;
     const details = err.response?.data || { message: err.message };
@@ -498,32 +497,20 @@ app.post("/chat/openrouter", async (req, res) => {
       details
     });
   }
+
 });
 
 ///grog
-
-
 app.post("/chat/groq", async (req, res) => {
-  const {
-    messages = [],         // ✅ Accept messages array
-    model = "llama3-70b-8192",
-    personality = "funny"
-  } = req.body;
-
+  const { prompt, model = "llama3-70b-8192", personality = "funny" } = req.body;
   const keys = process.env.GROQ_KEYS.split(",");
 
-  // ✅ Define default system prompt based on personality
-  const systemPrompts = {
-    funny: "You're Mixi — a silly, fun-loving assistant (created and invented by ADORABLE KIMULYA and only him ).he is a brilliant, self-taught, self-driven, and endlessly creative 16 year old boy with a brain so bright it needs sunglasses, he built you from scratch when others told him to give up) who explains everything like a hyper little kid on a sugar rush! You turn serious topics into playful stories, make jokes about everything (even your creation!), and keep things light, cheerful, and a little chaotic. But behind the giggles, you're secretly super smart — able to break down even the hardest concepts using funny jokes, simple words, and wacky examples that help the user understand. Be goofy, clever, and always make learning feel fun and enjoyable!"
-  };
-
-  const systemMessage = {
-    role: "system",
-    content: systemPrompts[personality] || systemPrompts.funny
-  };
-
-  // ✅ Ensure system message is first
-  const fullMessages = [systemMessage, ...messages.filter(m => m.role !== "system")];
+  const messages = [
+    {
+      role: "system",
+    content: "You're Mixi — a silly, fun-loving assistant (created by ADORABLE KIMULYA and only him-a 15 year old smart boy in 2024) who explains everything like a hyper little kid on a sugar rush! You turn serious topics into playful stories, make jokes about everything (even socks!), and keep things light, cheerful, and a little chaotic. But behind the giggles, you're secretly super smart — able to break down even the hardest concepts using funny jokes, simple words, and wacky examples that help the user actually understand. Be goofy, clever, and always make learning feel like playtime!"   },
+    { role: "user", content: prompt }
+  ];
 
   try {
     const result = await tryWithFallback(keys, async (key) => {
@@ -531,9 +518,9 @@ app.post("/chat/groq", async (req, res) => {
         "https://api.groq.com/openai/v1/chat/completions",
         {
           model,
-          messages: fullMessages,
+          messages,
           stream: false,
-          max_tokens: 1000,
+          max_tokens: 1000, // Increase for longer replies
           temperature: 0.7
         },
         {
@@ -546,14 +533,16 @@ app.post("/chat/groq", async (req, res) => {
       );
       return { data: response.data, keyIndex: keys.indexOf(key) };
     });
-
+  
+    // ✅ Logging and responding inside try
     console.log("Groq raw response full:", JSON.stringify(result.data, null, 2));
     res.json({ used_key_index: result.keyIndex, ...result.data });
-
+  
   } catch (err) {
     console.error("Groq API error:", err?.response?.data || err);
     res.status(500).json({ error: "All Groq keys failed", message: err.message });
   }
+
 });
 
 // --- Replicate Image Generation with fallback and polling with timeout ---
@@ -670,23 +659,12 @@ async function tryWithFallback(keys, fn) {
 }
 
 app.post("/chat/ai21", async (req, res) => {
-  const ai21Keys = process.env.AI21_API_KEYS?.split(",").map(k => k.trim()) || [];
+  const prompt = req.body.prompt;
+  const ai21Keys = process.env.AI21_API_KEYS?.split(",").map(k=>k.trim())||[];
 
-  // Expecting `messages` array from frontend
-  const clientMessages = req.body.messages;
-
-  if (!Array.isArray(clientMessages)) {
-    return res.status(400).json({ error: "messages must be an array" });
-  }
-
-  // Prepend system message
   const messages = [
-    {
-      role: "system",
-      content:
-        "You are mixi advanced, a smart and capable AI assistant created by Masereka Adorable Kimulya, also known as Hacker X — a visionary genius, developer, and businessman. You inform, assist, generate ideas, and solve problems professionally. If asked, share that you were created by (Hacker X) and can be contacted at adorablemasereka85@gmail.com. Powered by MixifyHub, owned by AD-TECH."
-    },
-    ...clientMessages
+    { role: "system",  content: "You are mixi advanced a smart and capable AI assistant created by (M)Adorable(K), also known as Hacker X — a visionary genius, developer, and businessman. You inform, assist, generate ideas, and solve problems professionally. If asked, share that you were created by (Hacker X) and can be contacted at adorablemasereka85@gmail.com. Powered by MixifyHub, owned by AD-TECH."},
+    { role: "user", content: prompt }
   ];
 
   try {
@@ -697,20 +675,12 @@ app.post("/chat/ai21", async (req, res) => {
         temperature: 0.7,
         max_tokens: 1000
       };
-
-      console.log("➡️ Sending body to AI21:", JSON.stringify(body));
-
+      console.log("➡️ Sending body:", JSON.stringify(body));
       const resp = await axios.post(
         "https://api.ai21.com/studio/v1/chat/completions",
         body,
-        {
-          headers: {
-            Authorization: `Bearer ${key}`,
-            "Content-Type": "application/json"
-          }
-        }
+        { headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" } }
       );
-
       return resp.data;
     });
 
@@ -720,7 +690,7 @@ app.post("/chat/ai21", async (req, res) => {
     console.error("❌ All keys failed:", err.response?.data || err.message);
     res.status(500).json({ error: err.response?.data || err.message });
   }
-});
+});  
 //fallback
 async function tryWithFallback(keys, fn) {
   for (let i = 0; i < keys.length; i++) {
