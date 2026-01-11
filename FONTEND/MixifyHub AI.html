@@ -2,64 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MixifyHub AI Assistant</title>
-  <link rel="stylesheet" href="mixifyHubai.css">
+  <title>pearl-Ai AFRICA'S BEST AI</title>
+  <link rel="stylesheet" href="index.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- Highlight.js CSS (choose any theme, this is GitHub dark) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
 <!-- Highlight.js JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>
-
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@picovoice/web-voice-processor"></script>
 <script src="https://unpkg.com/@picovoice/porcupine-web-en-worker"></script>
 <script src="https://unpkg.com/@picovoice/porcupine-web"></script>
 </head>
-<body class="theme-light">
-  <h2 class="heading">MixifyHub AI Assistant 🤖</h2>
+<body >
+  
 
-  <!-- Sidebar -->
-  <div class="fixed top-0 left-0 h-full z-50">
-    <div id="sidebar" class="w-64 min-h-screen bg-white dark:bg-gray-800 p-4 space-y-4 transition-all duration-300">
-     <span class="back-button" onclick="history.back()">↩️</span>
-    <button onclick="toggleSidebar()" class="mb-4 text-left">☰</button>
+  <div class="top-right-auth" tabindex="0">
+    <button onclick="window.location.href='login.html'">Log In</button>
+    <button onclick="window.location.href='register.html'">Sign Up</button>
+  </div>
+  
+  <!-- Sidebar Toggle Button -->
+<button id="sidebarToggle" class="sidebar-toggle">☰</button>
 
-    <a href="dashboard.html" class="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded">
-      <span>🏠</span><span class="label">Home</span>
-    </a>
-    <a href="images.html" class="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded">
-      <span>📁</span><span class="label">Generate Images</span>
-    </a>
-    <a href="profile.html" class="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded">
-      <span>⚙️</span><span class="label">Settings</span>
-    </a>
-
-    <div class="theme-selector">
-      <label>Select Theme:</label>
-      <select id="themeSelect">
-        <option value="theme-light">Light</option>
-        <option value="theme-dark">Dark</option>
-        <option value="theme-forest">Forest</option>
-        <option value="theme-pink">Pink</option>
-        <option value="theme-red">Red</option>
-        <option value="theme-white">White</option>
-      </select>
+<!-- Sidebar Container -->
+<div id="sidebarContainer">
+  <div id="sidebar">
+    <span class="back-button" onclick="history.back()">↩️</span>
+    
+    <div id="themeCustomizer" style="padding: 10px;">
+      <h3>🎨 Theme Customizer</h3>
+    
+      <label>Font Family:
+        <select id="fontFamilySelect">
+          <option value="Poppins, sans-serif">Poppins</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Courier New, monospace">Courier New</option>
+        </select>
+      </label><br><br>
+    
+      <label>Text Size:
+        <input type="range" id="textSizeRange" min="12" max="24" value="16">
+      </label><br><br>
+    
+      <label>Text Color:
+        <input type="color" id="textColorPicker" value="#000000">
+      </label><br><br>
+    
+      <label>Background Color:
+        <input type="color" id="bgColorPicker" value="#ffffff">
+      </label><br><br>
+    
+      <button onclick="saveTheme()"> Save Theme</button>
     </div>
+    
 
     <div class="personality-selector">
       <label for="personalitySelect">🧠 Personality:</label>
       <select id="personalitySelect">
-        <option value="friendly">😊 Friendly</option>
-        <option value="funny">😂 Funny</option>
+        <option value="friendly">😊Advanced Reasoning</option>
+        <option value="funny">😂 Explained Reasoning</option>
         <option value="professional">💼 Professional</option>
         <option value="motivational">💪 Motivational</option>
       </select>
     </div>
 
     <div style="text-align:center; margin-top:12px;">
-      <label for="langSelect">🎙️ Voice Input Language:</label>
+      <label for="langSelect">🎙️ auto Voice output tone:</label>
       <select id="langSelect">
         <option value="en-US">English (US)</option>
         <option value="en-GB">English (UK)</option>
@@ -76,36 +91,55 @@
       </select>
     
       <label style="margin-left:10px;">
-        🔊 <input type="checkbox" id="ttsToggle" checked> Speak Replies
+        🔊 <input type="checkbox" id="ttsToggle" checked> auto Speak Replies on bot responses
       </label>
     </div>
-    
-    <hr>
-    <hr>
+    <select id="ocrLangSelector">
+      <option value="eng" selected>English</option>
+      <option value="swa">Swahili</option>
+      <option value="lug">Luganda</option>
+    </select>
+    <button id="clearDataBtn">Clear All Chat Data</button>
+    <hr><hr>
     <button id="newChatBtn" class="w-full bg-blue-500 text-white p-2 rounded">➕ New Chat</button>
     <ul id="chatList" class="space-y-2 mt-4"></ul>
   </div>
 </div>
 
+
   <div id="chatbox" class="chatbox"> </div>
+<!-- Input Area -->
+<!-- Overlay (optional, for dimming background) -->
+<!-- Toggle Button (outside input area) -->
+<button id="inputToggleBtn" title="Toggle Input"><img src="speech-bubble.png" alt="🗨️" />
+</button>
 
-  <div class="input-area">
-    <textarea id="userInput" placeholder="Ask something..." rows="1"></textarea>
-    <button id="micBtn" title="Speak your question 🎤">🎤</button>
-    <button onclick="sendMessage()">Send</button>
-  </div>
+<!-- Optional Overlay -->
+<div id=".app-overlay"></div>
 
- <!-- Ad Modal -->
- 
-<!-- Move this outside of #chatbox and place it just before </body> -->
 
-<div id="adModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[9999]">
-  <div id="adContent" class="bg-white dark:bg-gray-800 p-6 rounded shadow-lg text-center max-w-md w-full mx-4">
-    <p class="mb-4 text-lg">Hi there friend 😴<br>💤 I'm tired. Please watch this video to recharge me! ⚡</p>
-    <button onclick="watchAd()" class="bg-blue-600 text-white px-4 py-2 rounded">Watch Video</button>
-  </div>
+<div class="ocr-result">
+  <img src="..." class="preview-img">
+  <div class="ocr-text">Detected: <strong>Some Text</strong></div>
 </div>
 
-  <script src="main.js"></script>
+<!-- Input Area -->
+<div class="input-area" id="inputArea"><button id="uploadImageBtn" title="Upload or Take Photo">
+  🖼️
+</button>
+
+  <textarea id="userInput" placeholder="Ask anything..." rows="1"></textarea>
+
+  <!-- 🆕 Image Upload Button -->
+  <input type="file" id="imageInput" accept="image/*" capture="environment" style="display: none;">
+  
+  <button id="micBtn" title="Speak your question">&#127897;</button>
+  <button class="send" onclick="sendMessage()">➤</button>
+</div>
+
+
+
+
+  <script src="index.js"></script>
 </body>
 </html>
